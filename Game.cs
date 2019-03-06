@@ -12,9 +12,9 @@ namespace DumBitEngine
     {
 
         private Cube cube;
-        private Mesh mesh;
+        private Model model;
         
-        public Game() : base(1280, 720, GraphicsMode.Default
+        public Game() : base(640, 480, GraphicsMode.Default
             , "DumBit Engine", GameWindowFlags.Default, DisplayDevice.Default
             , 3, 3, GraphicsContextFlags.ForwardCompatible)
         {}
@@ -22,7 +22,7 @@ namespace DumBitEngine
         [STAThread]
         static void Main(string[] args)
         {
-            new Game().Run( 60);
+            new Game().Run();
         }
 
         protected override void OnLoad(EventArgs e)
@@ -32,7 +32,7 @@ namespace DumBitEngine
             CursorVisible = true;
             
             cube = new Cube();
-            mesh = new Mesh("Seat.obj");
+            model = new Model("Seat.obj");
         }
         
         protected override void OnResize(EventArgs e)
@@ -70,7 +70,6 @@ namespace DumBitEngine
             base.OnClosed(e);
             
             cube.Dispose();
-            mesh.Dispose();
         }
     }
 }

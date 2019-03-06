@@ -49,10 +49,13 @@
     <ItemGroup>
         <Compile Include="Core\Shapes\Cube.cs" />
         <Compile Include="Core\Shapes\Mesh.cs" />
+        <Compile Include="Core\Shapes\Model.cs" />
         <Compile Include="Core\Shapes\Shape.cs" />
         <Compile Include="Core\Util\IDisposable.cs" />
         <Compile Include="Core\Util\IRenderable.cs" />
         <Compile Include="Core\Util\Shader.cs" />
+        <Compile Include="Core\Util\Texture.cs" />
+        <Compile Include="Core\Util\Vertex.cs" />
         <Compile Include="Game.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
