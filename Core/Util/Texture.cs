@@ -1,11 +1,15 @@
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using OpenTK.Graphics.OpenGL;
+using StbSharp;
+using Image = StbSharp.Image;
 using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 
 namespace DumBitEngine.Core.Util
 {
-    public struct Texture
+    public class Texture : IDisposable
     {
         public int id;
         public string type;
@@ -18,18 +22,30 @@ namespace DumBitEngine.Core.Util
             
             GL.GenTextures(1, out id);
             GL.BindTexture(TextureTarget.Texture2D, id);
-            
-            var textureLoader = new Bitmap(path);
-            BitmapData data = textureLoader.LockBits(new System.Drawing.Rectangle(0, 0, textureLoader.Width, textureLoader.Height),
-                ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
-            
 
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, textureLoader.Width, textureLoader.Height, 0,
-                PixelFormat.Rgb, PixelType.UnsignedByte, data.Scan0);
+            ImageReader reader = new ImageReader();
+            var stream = File.OpenRead(path);
+            
+            var img = reader.Read(stream);
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int) TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int) TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
+                (int) TextureMinFilter.LinearMipmapLinear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
+                (int) TextureMinFilter.Linear);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba
+                , img.Width, img.Height, 0,
+                PixelFormat.Rgba, PixelType.UnsignedByte, img.Data);
             GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
             
-            textureLoader.UnlockBits(data);
-            textureLoader.Dispose();
+            stream.Close();
+        }
+
+        public void Dispose()
+        {
+            
         }
     }
 }

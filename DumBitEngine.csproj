@@ -40,6 +40,10 @@
           <HintPath>packages\OpenTK.3.0.1\lib\net20\OpenTK.dll</HintPath>
           <Private>True</Private>
         </Reference>
+        <Reference Include="StbSharp, Version=0.7.2.38, Culture=neutral, PublicKeyToken=null">
+          <HintPath>packages\StbSharp.0.7.2.38\lib\net20\StbSharp.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
         <Reference Include="System" />
         <Reference Include="System.Core" />
         <Reference Include="System.Data" />
@@ -64,8 +68,13 @@
       <None Include="packages.config" />
     </ItemGroup>
     <ItemGroup>
+      <Content Include="Assets\container.jpg" />
       <Content Include="Assets\Shaders\basic.glsl" />
-      <Content Include="Seat.obj" />
+      <Content Include="Assets\Shaders\cube.glsl" />
+      <Content Include="Assets\Shaders\mesh.glsl" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Assets\Mesh" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <Import Project="packages\AssimpNet.4.1.0\build\AssimpNet.targets" Condition="Exists('packages\AssimpNet.4.1.0\build\AssimpNet.targets')" />

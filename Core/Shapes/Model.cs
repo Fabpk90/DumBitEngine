@@ -3,24 +3,41 @@ using System.Collections.Generic;
 using Assimp;
 using Assimp.Unmanaged;
 using DumBitEngine.Core.Util;
+using OpenTK;
 
 namespace DumBitEngine.Core.Shapes
 {
     public class Model : Shape
     {
+        private Shader shader;
+        private Matrix4 modelMatrix;
+        
         private Scene scene;
         public List<Mesh> meshes;
 
+        private string meshName;
         private string path;
 
-        public Model(string path)
+        public Model(string path, string meshName)
         {
             this.path = path;
+            this.meshName = meshName;
             var context = new AssimpContext();
+            
+            shader = new Shader("Assets/Shaders/mesh.glsl");
+            shader.Use();
+            
+            modelMatrix = Matrix4.Identity;
+            modelMatrix *= Matrix4.CreateTranslation(0, -1.75f, 0);
+            modelMatrix *= Matrix4.CreateScale(.2f, .2f, .2f);
+            
+            shader.SetMatrix4("model", ref modelMatrix);
+            shader.SetMatrix4("view", ref Game.view);
+            shader.SetMatrix4("projection", ref Game.projection);
             
             meshes = new List<Mesh>();
             
-            scene = context.ImportFile(path,
+            scene = context.ImportFile(path+meshName,
                 PostProcessSteps.Triangulate | PostProcessSteps.FlipUVs | PostProcessSteps.GenerateNormals);
 
             if (scene != null)
@@ -103,7 +120,7 @@ namespace DumBitEngine.Core.Shapes
                 TextureSlot texSlot;
                 if (material.GetMaterialTexture(type, i, out texSlot))
                 {
-                    Texture texture = new Texture(texSlot.FilePath, typeName);
+                    Texture texture = new Texture(path + texSlot.FilePath, typeName);
                     tex.Add(texture);
                 }
                 
@@ -118,16 +135,20 @@ namespace DumBitEngine.Core.Shapes
 
             foreach (var mesh in meshes)
             {
-                mesh.Dispose();
+               mesh.Dispose();
             }
             
         }
 
         public override void Draw()
         {
+            shader.Use();
+            
+            shader.SetMatrix4("view", ref Game.view);
+            
             foreach (var mesh in meshes)
             {
-                mesh.Draw();
+                mesh.Draw(ref shader);
             }
         }
     }

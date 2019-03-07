@@ -87,7 +87,7 @@ namespace DumBitEngine.Core.Util
         }
 
         public void SetInt(string name, int value)
-        {
+        {   
             GL.Uniform1(GL.GetUniformLocation(ProgramId, name), value);
         }
 
