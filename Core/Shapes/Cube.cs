@@ -7,7 +7,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace DumBitEngine.Core.Shapes
 {
-    public class Cube
+    public class Cube : Shape
     {
         private int vao;
         private int vbo;
@@ -87,7 +87,7 @@ namespace DumBitEngine.Core.Shapes
             shaderProgram = new Shader("Assets/Shaders/cube.glsl");
             shaderProgram.Use();
             
-            shaderProgram.SetMatrix4("projection", ref Game.projection);
+            shaderProgram.SetMatrix4("projection", ref Game.mainCamera.projection);
             
            texture0 = new Texture(texturePath, "");
             
@@ -100,30 +100,30 @@ namespace DumBitEngine.Core.Shapes
             shaderProgram.SetInt("tex0", 0);
         }
 
-        public void Draw(float deltaTime)
+        public override void Dispose()
         {
-            transform *= Matrix4.CreateRotationY(deltaTime);
-            transform *= Matrix4.CreateRotationX(deltaTime);
-            
+            // shaderProgram.Destroy();
+
+            GL.DeleteVertexArray(vao);
+
+            GL.DeleteBuffer(ebo);
+            GL.DeleteBuffer(vbo);
+
+            // texture0.Destroy();
+        }
+
+        public override void Draw()
+        {
+            transform *= Matrix4.CreateRotationY(Time.deltaTime);
+            transform *= Matrix4.CreateRotationX(Time.deltaTime);
+
             shaderProgram.Use();
             GL.BindVertexArray(vao);
 
             shaderProgram.SetMatrix4("transform", ref transform);
-            shaderProgram.SetMatrix4("view", ref Game.view);
+            shaderProgram.SetMatrix4("view", ref Game.mainCamera.view);
 
             GL.DrawElements(PrimitiveType.Triangles, index.Length, DrawElementsType.UnsignedInt, 0);
-        }
-
-        public void Dispose()
-        {
-           // shaderProgram.Destroy();
-            
-            GL.DeleteVertexArray(vao);
-            
-            GL.DeleteBuffer(ebo);
-            GL.DeleteBuffer(vbo);
-
-           // texture0.Destroy();
         }
     }
 }

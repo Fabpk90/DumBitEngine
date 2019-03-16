@@ -4,6 +4,7 @@ using Assimp;
 using Assimp.Unmanaged;
 using DumBitEngine.Core.Util;
 using OpenTK;
+using Scene = Assimp.Scene;
 
 namespace DumBitEngine.Core.Shapes
 {
@@ -32,8 +33,8 @@ namespace DumBitEngine.Core.Shapes
             modelMatrix *= Matrix4.CreateScale(.2f, .2f, .2f);
             
             shader.SetMatrix4("model", ref modelMatrix);
-            shader.SetMatrix4("view", ref Game.view);
-            shader.SetMatrix4("projection", ref Game.projection);
+            shader.SetMatrix4("view", ref Game.mainCamera.view);
+            shader.SetMatrix4("projection", ref Game.mainCamera.projection);
             
             meshes = new List<Mesh>();
             
@@ -115,12 +116,21 @@ namespace DumBitEngine.Core.Shapes
         {
             List<Texture> tex = new List<Texture>();
 
+            var time = System.DateTime.Now;
+
             for (int i = 0; i < material.GetMaterialTextureCount(type); i++)
             {
-                TextureSlot texSlot;
-                if (material.GetMaterialTexture(type, i, out texSlot))
+                if (material.GetMaterialTexture(type, i, out var texSlot))
                 {
-                    Texture texture = new Texture(path + texSlot.FilePath, typeName);
+                    //texSlot.FilePath. fix that, relative path
+                    var texFullPath = texSlot.FilePath.Split('\\');
+                    string texPath = texFullPath[texFullPath.Length - 1];
+
+                    var diff = DateTime.Now - time;
+                    time = DateTime.Now;
+                    Console.WriteLine(texPath+" Took : "+diff.Milliseconds);
+                    
+                    Texture texture = new Texture(path + texPath, typeName);
                     tex.Add(texture);
                 }
                 
@@ -144,7 +154,7 @@ namespace DumBitEngine.Core.Shapes
         {
             shader.Use();
             
-            shader.SetMatrix4("view", ref Game.view);
+            shader.SetMatrix4("view", ref Game.mainCamera.view);
             
             foreach (var mesh in meshes)
             {

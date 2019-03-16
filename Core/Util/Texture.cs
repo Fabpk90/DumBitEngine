@@ -27,6 +27,7 @@ namespace DumBitEngine.Core.Util
             var stream = File.OpenRead(path);
             
             var img = reader.Read(stream);
+            
 
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int) TextureWrapMode.Repeat);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int) TextureWrapMode.Repeat);
@@ -41,11 +42,12 @@ namespace DumBitEngine.Core.Util
             GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
             
             stream.Close();
+            GL.BindTexture(TextureTarget.Texture2D, 0);
         }
 
         public void Dispose()
         {
-            
+            GL.DeleteTexture(id);
         }
     }
 }

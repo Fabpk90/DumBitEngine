@@ -2,9 +2,8 @@ using DumBitEngine.Core.Util;
 
 namespace DumBitEngine.Core.Shapes
 {
-    public abstract class Shape : IDisposable, IRenderable
+    public abstract class Shape : Entity
     {
-        public abstract void Dispose();
-        public abstract void Draw();
+       //TODO: add new things here, like a transform maybe
     }
 }
