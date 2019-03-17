@@ -97,7 +97,10 @@ namespace DumBitEngine.Core.Shapes
 
         public void Dispose()
         {
-            
+            foreach (var texture in textures)
+            {
+                texture.Dispose();
+            }
         }
     }
 }

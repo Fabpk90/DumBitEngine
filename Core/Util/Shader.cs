@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.IO;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -7,29 +8,46 @@ namespace DumBitEngine.Core.Util
 {
     public class Shader : IDisposable
     {
+        public static Hashtable table = new Hashtable();
         public int ProgramId { get; }
+
+        private string path;
 
         public Shader(string path)
         {
-            string fragmentShader, vertexShader;
+            if (table.ContainsKey(path))
+            {
+                Shader shader = (Shader)table[path];
+                ProgramId = shader.ProgramId;
+            }
+            else
+            {
+                this.path = path;
+                
+                string fragmentShader, vertexShader;
 
-            ProgramId = GL.CreateProgram();
+                ProgramId = GL.CreateProgram();
             
-            ParseShader(path, out vertexShader, out fragmentShader);
+                ParseShader(path, out vertexShader, out fragmentShader);
 
-            int fs = CompileShader(fragmentShader, ShaderType.FragmentShader);
-            int vs = CompileShader(vertexShader, ShaderType.VertexShader);
+                int fs = CompileShader(fragmentShader, ShaderType.FragmentShader);
+                int vs = CompileShader(vertexShader, ShaderType.VertexShader);
             
-            GL.AttachShader(ProgramId, fs);
-            GL.AttachShader(ProgramId, vs);
+                GL.AttachShader(ProgramId, fs);
+                GL.AttachShader(ProgramId, vs);
 
             
-            GL.LinkProgram(ProgramId);
-            GL.ValidateProgram(ProgramId);
+                GL.LinkProgram(ProgramId);
+                GL.ValidateProgram(ProgramId);
 
-            //clean intermediates
-            GL.DeleteShader(vs);
-            GL.DeleteShader(fs);
+                //clean intermediates
+                GL.DeleteShader(vs);
+                GL.DeleteShader(fs);
+                
+                table.Add(path, this);
+            }
+            
+           
         }
         private void ParseShader(string path, out string shaderVertex, out string shaderFragment)
         {
@@ -97,8 +115,14 @@ namespace DumBitEngine.Core.Util
         }
 
         public void Dispose()
-        {
-            GL.DeleteProgram(ProgramId);
+        {  
+            if (table.ContainsKey(path))
+            {
+                GL.DeleteProgram(ProgramId);
+                table.Remove(path);
+
+                Console.WriteLine("Unloading shader at: "+path+" remaining "+table.Count);
+            }         
         }
     }
 }

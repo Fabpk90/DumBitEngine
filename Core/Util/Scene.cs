@@ -6,21 +6,29 @@ using System.Threading.Tasks;
 
 namespace DumBitEngine.Core.Util
 {
-    class Scene : IRenderable
+    class Scene : Entity
     {
-        public List<IRenderable> sceneGraph;
+        public List<Entity> sceneGraph;
 
         public Scene()
         {
-            sceneGraph = new List<IRenderable>();
+            sceneGraph = new List<Entity>();
         }
 
-        public void AddRenderable(IRenderable renderable)
+        public void AddRenderable(Entity entity)
         {
-            sceneGraph.Add(renderable);
+            sceneGraph.Add(entity);
         }
 
-        public void Draw()
+        public override void Dispose()
+        {
+            for (int i = 0; i < sceneGraph.Count; i++)
+            {
+                sceneGraph[i].Dispose();
+            }
+        }
+
+        public override void Draw()
         {
             for (int i = 0; i < sceneGraph.Count; i++)
             {

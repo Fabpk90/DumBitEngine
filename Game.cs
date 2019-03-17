@@ -82,7 +82,7 @@ namespace DumBitEngine
             KeyboardState keyboard = Keyboard.GetState();
 
             if (keyboard.IsKeyDown(Key.Escape))
-                Exit();
+                Close();
 
             if (keyboard.IsKeyDown(Key.Up))
             {
@@ -108,7 +108,8 @@ namespace DumBitEngine
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
-
+            
+            scene.Dispose();
         }
     }
 }

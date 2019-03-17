@@ -124,17 +124,16 @@ namespace DumBitEngine.Core.Shapes
                 {
                     //texSlot.FilePath. fix that, relative path
                     var texFullPath = texSlot.FilePath.Split('\\');
-                    string texPath = texFullPath[texFullPath.Length - 1];
-
-                    var diff = DateTime.Now - time;
-                    time = DateTime.Now;
-                    Console.WriteLine(texPath+" Took : "+diff.Milliseconds);
+                    string texPath = texFullPath[texFullPath.Length - 1]; 
                     
                     Texture texture = new Texture(path + texPath, typeName);
                     tex.Add(texture);
                 }
                 
             }
+            
+           // var diff = DateTime.Now - time;
+           // Console.WriteLine("Loading "+material.Name+" took : "+diff.Milliseconds);
 
             return tex;
         }
@@ -147,6 +146,8 @@ namespace DumBitEngine.Core.Shapes
             {
                mesh.Dispose();
             }
+            
+            shader.Dispose();
             
         }
 

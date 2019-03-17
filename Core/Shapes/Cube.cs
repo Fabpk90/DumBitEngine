@@ -102,14 +102,14 @@ namespace DumBitEngine.Core.Shapes
 
         public override void Dispose()
         {
-            // shaderProgram.Destroy();
+            shaderProgram.Dispose();
 
             GL.DeleteVertexArray(vao);
 
             GL.DeleteBuffer(ebo);
             GL.DeleteBuffer(vbo);
 
-            // texture0.Destroy();
+            texture0.Dispose();
         }
 
         public override void Draw()
