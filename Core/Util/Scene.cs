@@ -15,7 +15,7 @@ namespace DumBitEngine.Core.Util
             sceneGraph = new List<Entity>();
         }
 
-        public void AddRenderable(Entity entity)
+        public void AddEntity(Entity entity)
         {
             sceneGraph.Add(entity);
         }

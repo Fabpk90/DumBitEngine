@@ -20,6 +20,10 @@ namespace DumBitEngine
 
         private Camera camera;
 
+        //TODO: add counter for assets-> to know when to really dispose them
+        //add a real camera class
+        //add a menu of some sort
+
         public Game() : base(640, // initial width
             480, // initial height
             GraphicsMode.Default,
@@ -34,14 +38,15 @@ namespace DumBitEngine
         [STAThread]
         static void Main(string[] args)
         {
-            new Game().Run(60);
+            var game = new Game();
+            game.Run();
         }
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
 
-            CursorVisible = true;
+            CursorVisible = false;
 
             camera = new Camera(Width, Height);
             mainCamera = camera;
@@ -50,8 +55,8 @@ namespace DumBitEngine
             cube = new Cube("Assets/container.jpg");
 
             scene = new Scene();
-            scene.AddRenderable(model);
-            scene.AddRenderable(cube);
+            scene.AddEntity(model);
+            scene.AddEntity(cube);
         }
 
         protected override void OnResize(EventArgs e)
@@ -82,7 +87,7 @@ namespace DumBitEngine
             KeyboardState keyboard = Keyboard.GetState();
 
             if (keyboard.IsKeyDown(Key.Escape))
-                Close();
+                Exit();
 
             if (keyboard.IsKeyDown(Key.Up))
             {
@@ -101,6 +106,12 @@ namespace DumBitEngine
             {
                 mainCamera.cameraPos.X += .5f;
             }
+
+            if (keyboard.IsKeyDown(Key.E))
+                scene.AddEntity(new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj"));
+            if (keyboard.IsKeyDown(Key.R))
+                scene.Dispose();
+
 
             camera.Draw();
         }

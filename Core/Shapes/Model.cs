@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Assimp;
 using Assimp.Unmanaged;
@@ -10,6 +11,7 @@ namespace DumBitEngine.Core.Shapes
 {
     public class Model : Shape
     {
+        private static Hashtable table = new Hashtable();
         private Shader shader;
         private Matrix4 modelMatrix;
         
@@ -21,31 +23,56 @@ namespace DumBitEngine.Core.Shapes
 
         public Model(string path, string meshName)
         {
-            this.path = path;
-            this.meshName = meshName;
-            var context = new AssimpContext();
-            
-            shader = new Shader("Assets/Shaders/mesh.glsl");
-            shader.Use();
-            
-            modelMatrix = Matrix4.Identity;
-            modelMatrix *= Matrix4.CreateTranslation(0, -1.75f, 0);
-            modelMatrix *= Matrix4.CreateScale(.2f, .2f, .2f);
-            
-            shader.SetMatrix4("model", ref modelMatrix);
-            shader.SetMatrix4("view", ref Game.mainCamera.view);
-            shader.SetMatrix4("projection", ref Game.mainCamera.projection);
-            
-            meshes = new List<Mesh>();
-            
-            scene = context.ImportFile(path+meshName,
-                PostProcessSteps.Triangulate | PostProcessSteps.FlipUVs | PostProcessSteps.GenerateNormals);
-
-            if (scene != null)
+            Console.WriteLine("Creating model");
+            if(table.ContainsKey(path+meshName))
             {
-                ProcessNode(scene.RootNode, scene);
+                Model model = (Model)table[path + meshName];
+
+                this.path = model.path;
+                this.meshName = model.meshName;
+                this.meshes = model.meshes;
+                this.scene = model.scene;
+
+                shader = new Shader("Assets/Shaders/mesh.glsl");
+                shader.Use();
+
+                modelMatrix = Matrix4.Identity;
+                modelMatrix *= Matrix4.CreateTranslation(0, -1.75f, 0);
+                modelMatrix *= Matrix4.CreateScale(.2f, .2f, .2f);
+
+                shader.SetMatrix4("model", ref modelMatrix);
+                shader.SetMatrix4("view", ref Game.mainCamera.view);
+                shader.SetMatrix4("projection", ref Game.mainCamera.projection);
             }
-            
+            else
+            {
+                this.path = path;
+                this.meshName = meshName;
+                var context = new AssimpContext();
+
+                shader = new Shader("Assets/Shaders/mesh.glsl");
+                shader.Use();
+
+                modelMatrix = Matrix4.Identity;
+                modelMatrix *= Matrix4.CreateTranslation(0, -1.75f, 0);
+                modelMatrix *= Matrix4.CreateScale(.2f, .2f, .2f);
+
+                shader.SetMatrix4("model", ref modelMatrix);
+                shader.SetMatrix4("view", ref Game.mainCamera.view);
+                shader.SetMatrix4("projection", ref Game.mainCamera.projection);
+
+                meshes = new List<Mesh>();
+
+                scene = context.ImportFile(path + meshName,
+                    PostProcessSteps.Triangulate | PostProcessSteps.FlipUVs | PostProcessSteps.GenerateNormals);
+
+                if (scene != null)
+                {
+                    ProcessNode(scene.RootNode, scene);
+                }
+
+                table.Add(path + meshName, this);
+            }       
         }
 
         private void ProcessNode(Node node, Scene scene)
@@ -96,7 +123,6 @@ namespace DumBitEngine.Core.Shapes
                 }
             }
             
-            
             //loading material
             if (mesh.MaterialIndex >= 0)
             {
@@ -140,15 +166,17 @@ namespace DumBitEngine.Core.Shapes
 
         public override void Dispose()
         {
-            scene.Clear();
-
-            foreach (var mesh in meshes)
+            if(table.ContainsKey(path+meshName))
             {
-               mesh.Dispose();
-            }
-            
-            shader.Dispose();
-            
+                scene.Clear();
+
+                foreach (var mesh in meshes)
+                {
+                    mesh.Dispose();
+                }
+
+                shader.Dispose();
+            }  
         }
 
         public override void Draw()

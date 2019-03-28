@@ -19,6 +19,7 @@ namespace DumBitEngine.Core.Util
             {
                 Shader shader = (Shader)table[path];
                 ProgramId = shader.ProgramId;
+                this.path = path;
             }
             else
             {
