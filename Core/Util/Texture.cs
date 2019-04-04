@@ -19,8 +19,6 @@ namespace DumBitEngine.Core.Util
         public int id;
         public string type;
         public string path;
-        
-        
 
         public Texture(string path, string type)
         {
@@ -56,10 +54,22 @@ namespace DumBitEngine.Core.Util
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
                     (int) TextureMinFilter.Linear);
 
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba
-                    , img.Width, img.Height, 0,
-                    PixelFormat.Rgba, PixelType.UnsignedByte, img.Data);
-                GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+                if (path.Contains(".jpg"))
+                {
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb
+                        , img.Width, img.Height, 0,
+                        PixelFormat.Rgb, PixelType.UnsignedByte, img.Data);
+                    GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+                }
+                else
+                {
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba
+                        , img.Width, img.Height, 0,
+                        PixelFormat.Rgba, PixelType.UnsignedByte, img.Data);
+                    GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+                }
+
+                
             
                 stream.Close();
                 GL.BindTexture(TextureTarget.Texture2D, 0);
