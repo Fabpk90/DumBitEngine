@@ -11,11 +11,9 @@ namespace DumBitEngine.Core.Shapes
 {
     public class Model : Shape
     {
-        private static Hashtable table = new Hashtable();
         private Shader shader;
         private Matrix4 modelMatrix;
         
-        private Scene scene;
         public List<Mesh> meshes;
 
         private string meshName;
@@ -23,26 +21,24 @@ namespace DumBitEngine.Core.Shapes
 
         public Model(string path, string meshName)
         {
-            Console.WriteLine("Creating model");
-            if(table.ContainsKey(path+meshName))
+            var asset = AssetLoader.UseElement(path + meshName);
+            
+            if (asset != null)
             {
-                Model model = (Model)table[path + meshName];
+                Model model = asset as Model;
 
-                this.path = model.path;
-                this.meshName = model.meshName;
-                this.meshes = model.meshes;
-                this.scene = model.scene;
+                Console.WriteLine("Loading from table");
 
-                shader = new Shader("Assets/Shaders/mesh.glsl");
-                shader.Use();
+                if (model != null)
+                {
+                    meshes = model.meshes;
+                    shader = model.shader;
 
-                modelMatrix = Matrix4.Identity;
-                modelMatrix *= Matrix4.CreateTranslation(0, -1.75f, 0);
-                modelMatrix *= Matrix4.CreateScale(.2f, .2f, .2f);
-
-                shader.SetMatrix4("model", ref modelMatrix);
-                shader.SetMatrix4("view", ref Game.mainCamera.view);
-                shader.SetMatrix4("projection", ref Game.mainCamera.projection);
+                    this.meshName = meshName;
+                    this.path = path;
+                    
+                    modelMatrix = model.modelMatrix;
+                }
             }
             else
             {
@@ -63,16 +59,18 @@ namespace DumBitEngine.Core.Shapes
 
                 meshes = new List<Mesh>();
 
-                scene = context.ImportFile(path + meshName,
+                var scene = context.ImportFile(path + meshName,
                     PostProcessSteps.Triangulate | PostProcessSteps.FlipUVs | PostProcessSteps.GenerateNormals);
 
                 if (scene != null)
                 {
                     ProcessNode(scene.RootNode, scene);
                 }
-
-                table.Add(path + meshName, this);
-            }       
+                
+                scene.Clear();
+                
+                AssetLoader.AddElement(path+meshName, this);
+            }           
         }
 
         private void ProcessNode(Node node, Scene scene)
@@ -166,10 +164,8 @@ namespace DumBitEngine.Core.Shapes
 
         public override void Dispose()
         {
-            if(table.ContainsKey(path+meshName))
+            if(AssetLoader.RemoveElement(path+meshName))
             {
-                scene.Clear();
-
                 foreach (var mesh in meshes)
                 {
                     mesh.Dispose();

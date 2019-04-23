@@ -12,24 +12,21 @@ namespace DumBitEngine.Core.Util
 {
     public class Texture : IDisposable
     {
-
-        public static Hashtable table = new Hashtable();
-        
-        
         public int id;
         public string type;
         public string path;
 
         public Texture(string path, string type)
         {
+            var asset = AssetLoader.UseElement(path + type);
             //checks if the texture has already been loaded
-            if (table.ContainsKey(path + type))
+            if (asset != null)
             {
-                Texture tex = (Texture) table[path + type];
-                id = tex.id;
-                type = tex.type;
-                path = tex.path;
+                Texture tex = (Texture) asset;
 
+                id = tex.id;
+                this.type = type;
+                this.path = path;
                 
                 Console.WriteLine("Loading from hastable "+path+type);
             }
@@ -45,7 +42,7 @@ namespace DumBitEngine.Core.Util
                 var stream = File.OpenRead(path);
             
                 var img = reader.Read(stream);
-            
+                stream.Close();
 
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int) TextureWrapMode.Repeat);
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int) TextureWrapMode.Repeat);
@@ -54,44 +51,29 @@ namespace DumBitEngine.Core.Util
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
                     (int) TextureMinFilter.Linear);
 
-                if (path.Contains(".jpg"))
-                {
-                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb
-                        , img.Width, img.Height, 0,
-                        PixelFormat.Rgb, PixelType.UnsignedByte, img.Data);
-                    GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-                }
-                else
-                {
-                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba
-                        , img.Width, img.Height, 0,
-                        PixelFormat.Rgba, PixelType.UnsignedByte, img.Data);
-                    GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-                }
+                GL.TexImage2D(TextureTarget.Texture2D, 0,
+                    img.Comp == 3 ? PixelInternalFormat.Rgb : PixelInternalFormat.Rgba
+                    , img.Width, img.Height, 0,
+                    PixelFormat.Rgba, PixelType.UnsignedByte, img.Data);
+
+                GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 
                 
-            
-                stream.Close();
                 GL.BindTexture(TextureTarget.Texture2D, 0);
                 
                 Console.WriteLine("Loading into hashable "+path+type);
                 
-                table.Add(path+type, this);
+                AssetLoader.AddElement(path+type, this);
             }
-            
-            
         }
 
         public void Dispose()
         {
-            if (table.ContainsKey(path + type))
+            if (AssetLoader.RemoveElement(path+type))
             {
                 GL.DeleteTexture(id);
-                table.Remove(path+type);
-
-                Console.WriteLine("Unloading "+path+type +" remaining "+table.Count);
+                Console.WriteLine("Unloading " + path + type);
             }
-            
         }
     }
 }

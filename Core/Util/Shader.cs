@@ -8,16 +8,17 @@ namespace DumBitEngine.Core.Util
 {
     public class Shader : IDisposable
     {
-        public static Hashtable table = new Hashtable();
         public int ProgramId { get; }
 
         private string path;
 
         public Shader(string path)
         {
-            if (table.ContainsKey(path))
+            var asset = AssetLoader.UseElement(path);
+            
+            if (asset != null)
             {
-                Shader shader = (Shader)table[path];
+                Shader shader = (Shader)asset;
                 ProgramId = shader.ProgramId;
                 this.path = path;
             }
@@ -45,7 +46,7 @@ namespace DumBitEngine.Core.Util
                 GL.DeleteShader(vs);
                 GL.DeleteShader(fs);
                 
-                table.Add(path, this);
+                AssetLoader.AddElement(path, this);
             }
             
            
@@ -117,13 +118,12 @@ namespace DumBitEngine.Core.Util
 
         public void Dispose()
         {  
-            if (table.ContainsKey(path))
+            if (AssetLoader.RemoveElement(path))
             {
                 GL.DeleteProgram(ProgramId);
-                table.Remove(path);
-
-                Console.WriteLine("Unloading shader at: "+path+" remaining "+table.Count);
-            }         
+               
+                Console.WriteLine("Unloading shader at: "+path);
+            }       
         }
     }
 }

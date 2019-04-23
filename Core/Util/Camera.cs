@@ -13,8 +13,6 @@ namespace DumBitEngine.Core.Util
         public Matrix4 view;
         public Matrix4 projection;
 
-        private Vector3 worldUp;
-
         public Vector3 cameraPos;
         private Vector3 cameraUp;
         private Vector3 cameraFront;
@@ -23,14 +21,13 @@ namespace DumBitEngine.Core.Util
         private Vector2 previousMousePos;
         private Vector2 mousePos;
 
-        public Vector3 CameraFront { get => cameraFront; }
+        public Vector3 CameraFront => cameraFront;
 
         public Camera(float screenWidth, float screenHeight)
         {
             cameraPos = new Vector3(0, 0, 10f);
             cameraFront = new Vector3(0, 0, -1f);
             cameraUp = new Vector3(0, 1, 0);
-            worldUp = cameraUp;
 
             projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(55.0f), screenWidth / screenHeight,
                 0.1f, 100f);
@@ -48,23 +45,13 @@ namespace DumBitEngine.Core.Util
                 Vector2 deltaPos = previousMousePos - position;
                 previousMousePos = position;
 
-                cameraFront.X = (float)MathHelper.DegreesToRadians(Math.Sin(deltaPos.X));
-                cameraFront.Y = (float)MathHelper.DegreesToRadians(Math.Sin(deltaPos.Y));
+                cameraFront.X = (float)(Math.Sin(MathHelper.DegreesToRadians(deltaPos.X)));
+                cameraFront.Y = (float)Math.Sin(MathHelper.DegreesToRadians((deltaPos.Y)));
                 cameraFront.Normalize();
 
-                cameraRight = (Vector3.Cross(cameraFront, worldUp)).Normalized();
+                cameraRight = (Vector3.Cross(cameraFront, Vector3.UnitY)).Normalized();
                 cameraUp = (Vector3.Cross(cameraRight, cameraFront)).Normalized();
             }  
-        }
-
-        public void GoRight(float amount)
-        {
-
-        }
-
-        public void GoLeft(float amount)
-        {
-
         }
 
         public void Draw()

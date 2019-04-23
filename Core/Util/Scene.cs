@@ -26,6 +26,8 @@ namespace DumBitEngine.Core.Util
             {
                 sceneGraph[i].Dispose();
             }
+            
+            sceneGraph.Clear();
         }
 
         public override void Draw()

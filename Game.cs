@@ -6,6 +6,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using System;
 using System.Drawing;
+using DumBitEngine.Core.Sound;
 
 namespace DumBitEngine
 {
@@ -45,8 +46,10 @@ namespace DumBitEngine
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
+            
+            AudioMaster.Init();
 
-            CursorVisible = false;
+            CursorVisible = true;
 
             camera = new Camera(Width, Height);
             mainCamera = camera;

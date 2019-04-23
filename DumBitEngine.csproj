@@ -70,6 +70,8 @@
     <Compile Include="Core\Shapes\Mesh.cs" />
     <Compile Include="Core\Shapes\Model.cs" />
     <Compile Include="Core\Shapes\Shape.cs" />
+    <Compile Include="Core\Sound\AudioMaster.cs" />
+    <Compile Include="Core\Util\AssetLoader.cs" />
     <Compile Include="Core\Util\Camera.cs" />
     <Compile Include="Core\Util\Entity.cs" />
     <Compile Include="Core\Util\IDisposable.cs" />
