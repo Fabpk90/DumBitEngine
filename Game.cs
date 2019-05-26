@@ -7,6 +7,7 @@ using OpenTK.Input;
 using System;
 using System.Drawing;
 using DumBitEngine.Core.Sound;
+using ImGuiNET;
 
 namespace DumBitEngine
 {
@@ -20,15 +21,16 @@ namespace DumBitEngine
         public static Camera mainCamera;
 
         private Camera camera;
+        private ImGuiIOPtr _io;
 
-        //TODO: add counter for assets-> to know when to really dispose them
-        //add a real camera class
-        //add a menu of some sort
+       /* TODO add a real camera class - add a menu of some sort
+            optimize the handling of vertices (store only the vertices and different transform for each)
+        */
 
         public Game() : base(640, // initial width
             480, // initial height
             GraphicsMode.Default,
-            "Test OpenTk", // initial title
+            "DumBit Engine", 
             GameWindowFlags.Default,
             DisplayDevice.Default,
             3, // OpenGL major version
@@ -39,8 +41,7 @@ namespace DumBitEngine
         [STAThread]
         static void Main(string[] args)
         {
-            var game = new Game();
-            game.Run();
+            new Game().Run();
         }
 
         protected override void OnLoad(EventArgs e)
@@ -50,6 +51,7 @@ namespace DumBitEngine
             AudioMaster.Init();
 
             CursorVisible = true;
+            VSync = VSyncMode.On;
 
             camera = new Camera(Width, Height);
             mainCamera = camera;
@@ -60,6 +62,9 @@ namespace DumBitEngine
             scene = new Scene();
             scene.AddEntity(model);
             scene.AddEntity(cube);
+            
+            scene.AddEntity(new LightSource());
+
         }
 
         protected override void OnResize(EventArgs e)
@@ -71,6 +76,12 @@ namespace DumBitEngine
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
+            
+            if (!Focused)
+            {
+                return;
+            }
+
             Time.deltaTime = (float) e.Time;
             base.OnUpdateFrame(e);
             HandleInput();
@@ -92,23 +103,7 @@ namespace DumBitEngine
             if (keyboard.IsKeyDown(Key.Escape))
                 Exit();
 
-            if (keyboard.IsKeyDown(Key.Up))
-            {
-                mainCamera.cameraPos += mainCamera.CameraFront * .5f;
-            }
-            else if (keyboard.IsKeyDown(Key.Down))
-            {
-                mainCamera.cameraPos -= mainCamera.CameraFront * .5f;
-            }
-
-            if (keyboard.IsKeyDown(Key.Left))
-            {
-                mainCamera.cameraPos.X -= .5f;
-            }
-            else if (keyboard.IsKeyDown(Key.Right))
-            {
-                mainCamera.cameraPos.X += .5f;
-            }
+            mainCamera.InputUpdate(keyboard);
 
             if (keyboard.IsKeyDown(Key.E))
                 scene.AddEntity(new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj"));
@@ -122,7 +117,6 @@ namespace DumBitEngine
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
-            
             scene.Dispose();
         }
     }

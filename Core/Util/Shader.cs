@@ -116,6 +116,11 @@ namespace DumBitEngine.Core.Util
             GL.UniformMatrix4(GL.GetUniformLocation(ProgramId, name),false, ref matrix);
         }
 
+        public void SetVector3(string name, ref Vector3 vector)
+        {
+            GL.Uniform3(GL.GetUniformLocation(ProgramId, name), ref vector);
+        }
+
         public void Dispose()
         {  
             if (AssetLoader.RemoveElement(path))

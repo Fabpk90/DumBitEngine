@@ -17,8 +17,6 @@ namespace DumBitEngine.Core.Shapes
 
         private Shader shaderProgram;
 
-        private Bitmap textureLoader;
-
         private Texture texture0;
         
         
@@ -26,8 +24,6 @@ namespace DumBitEngine.Core.Shapes
         private uint[] index;
 
         private Matrix4 transform;
-
-        private Color4 color;
 
         public Cube(string texturePath)
         {

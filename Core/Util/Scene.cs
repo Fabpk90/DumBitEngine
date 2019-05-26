@@ -8,7 +8,7 @@ namespace DumBitEngine.Core.Util
 {
     class Scene : Entity
     {
-        public List<Entity> sceneGraph;
+        private List<Entity> sceneGraph;
 
         public Scene()
         {
@@ -22,19 +22,19 @@ namespace DumBitEngine.Core.Util
 
         public override void Dispose()
         {
-            for (int i = 0; i < sceneGraph.Count; i++)
+            foreach (var entity in sceneGraph)
             {
-                sceneGraph[i].Dispose();
+                entity.Dispose();
             }
-            
+
             sceneGraph.Clear();
         }
 
         public override void Draw()
         {
-            for (int i = 0; i < sceneGraph.Count; i++)
+            foreach (var entity in sceneGraph)
             {
-                sceneGraph[i].Draw();
+                entity.Draw();
             }
         }
     }

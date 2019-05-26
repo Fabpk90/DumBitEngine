@@ -19,7 +19,8 @@ namespace DumBitEngine.Core.Util
         private Vector3 cameraRight;
 
         private Vector2 previousMousePos;
-        private Vector2 mousePos;
+
+        private float speed;
 
         public Vector3 CameraFront => cameraFront;
 
@@ -35,6 +36,8 @@ namespace DumBitEngine.Core.Util
 
             previousMousePos.X = Mouse.GetState().X;
             previousMousePos.Y = Mouse.GetState().Y;
+
+            speed = 1.0f;
         }
 
         private void UpdateCameraLook()
@@ -59,6 +62,36 @@ namespace DumBitEngine.Core.Util
             UpdateCameraLook();
 
             view = Matrix4.LookAt(cameraPos, cameraFront + cameraPos, cameraUp);
+        }
+
+        public void InputUpdate(KeyboardState keyboard)
+        {
+            if (keyboard.IsKeyDown(Key.Up))
+            {
+                cameraPos += CameraFront * speed * Time.deltaTime;
+            }
+            else if (keyboard.IsKeyDown(Key.Down))
+            {
+                cameraPos -= CameraFront * speed * Time.deltaTime;
+            }
+
+            if (keyboard.IsKeyDown(Key.Left))
+            {
+                cameraPos -= Vector3.Normalize(Vector3.Cross(cameraFront, cameraUp)) * speed * Time.deltaTime;
+            }
+            else if (keyboard.IsKeyDown(Key.Right))
+            {
+                cameraPos += Vector3.Normalize(Vector3.Cross(cameraFront, cameraUp)) * speed * Time.deltaTime;
+            }
+            
+            if (keyboard.IsKeyDown(Key.Space))
+            {
+                cameraPos += cameraUp * speed * Time.deltaTime;
+            }
+            else if (keyboard.IsKeyDown(Key.ShiftLeft))
+            {
+                cameraPos -= cameraUp * speed * Time.deltaTime;
+            }
         }
     }
 }
