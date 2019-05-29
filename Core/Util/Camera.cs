@@ -20,7 +20,11 @@ namespace DumBitEngine.Core.Util
 
         private Vector2 previousMousePos;
 
-        private float speed;
+        private float movementSpeed;
+        private float mouseSensitivity;
+
+        private float yaw;
+        private float pitch;
 
         public Vector3 CameraFront => cameraFront;
 
@@ -34,27 +38,50 @@ namespace DumBitEngine.Core.Util
                 0.1f, 100f);
             view = Matrix4.LookAt(cameraPos, cameraFront + cameraPos, cameraUp);
 
-            previousMousePos.X = Mouse.GetState().X;
-            previousMousePos.Y = Mouse.GetState().Y;
+            previousMousePos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+            Console.WriteLine("starting position " + previousMousePos);
 
-            speed = 1.0f;
+            movementSpeed = 1.5f;
+
+            yaw = pitch = 0.0f;
+            mouseSensitivity = .25f;
         }
 
         private void UpdateCameraLook()
         {
             Vector2 position = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+            Console.WriteLine("position " + position);
             if(position != previousMousePos)
             {
                 Vector2 deltaPos = previousMousePos - position;
+
+                Console.WriteLine("deltaPos " + deltaPos);
+                
                 previousMousePos = position;
 
-                cameraFront.X = (float)(Math.Sin(MathHelper.DegreesToRadians(deltaPos.X)));
-                cameraFront.Y = (float)Math.Sin(MathHelper.DegreesToRadians((deltaPos.Y)));
-                cameraFront.Normalize();
+                yaw += -deltaPos.X * mouseSensitivity;
+                pitch -= -deltaPos.Y * mouseSensitivity;
 
-                cameraRight = (Vector3.Cross(cameraFront, Vector3.UnitY)).Normalized();
-                cameraUp = (Vector3.Cross(cameraRight, cameraFront)).Normalized();
+                if (pitch >= 89f)
+                    pitch = 89f;
+                else if (pitch <= -89f)
+                    pitch = -89f;
+
+               
             }  
+            
+            //this is outside of the if statement cause inside it causes a violent motion
+            //because of the initial rotation not being 0 i reckon 
+            
+            cameraFront.X = (float) Math.Cos(MathHelper.DegreesToRadians(pitch)) *
+                            (float) Math.Cos(MathHelper.DegreesToRadians(yaw));
+            cameraFront.Y = (float)Math.Sin(MathHelper.DegreesToRadians(pitch));
+            cameraFront.Z = (float) Math.Cos(MathHelper.DegreesToRadians(pitch)) *
+                            (float) Math.Sin(MathHelper.DegreesToRadians(yaw));
+            cameraFront.Normalize();
+
+            cameraRight = (Vector3.Cross(cameraFront, Vector3.UnitY)).Normalized();
+            cameraUp = (Vector3.Cross(cameraRight, cameraFront)).Normalized();
         }
 
         public void Draw()
@@ -68,29 +95,29 @@ namespace DumBitEngine.Core.Util
         {
             if (keyboard.IsKeyDown(Key.Up))
             {
-                cameraPos += CameraFront * speed * Time.deltaTime;
+                cameraPos += CameraFront * movementSpeed * Time.deltaTime;
             }
             else if (keyboard.IsKeyDown(Key.Down))
             {
-                cameraPos -= CameraFront * speed * Time.deltaTime;
+                cameraPos -= CameraFront * movementSpeed * Time.deltaTime;
             }
 
             if (keyboard.IsKeyDown(Key.Left))
             {
-                cameraPos -= Vector3.Normalize(Vector3.Cross(cameraFront, cameraUp)) * speed * Time.deltaTime;
+                cameraPos -= Vector3.Normalize(Vector3.Cross(cameraFront, cameraUp)) * movementSpeed * Time.deltaTime;
             }
             else if (keyboard.IsKeyDown(Key.Right))
             {
-                cameraPos += Vector3.Normalize(Vector3.Cross(cameraFront, cameraUp)) * speed * Time.deltaTime;
+                cameraPos += Vector3.Normalize(Vector3.Cross(cameraFront, cameraUp)) * movementSpeed * Time.deltaTime;
             }
             
             if (keyboard.IsKeyDown(Key.Space))
             {
-                cameraPos += cameraUp * speed * Time.deltaTime;
+                cameraPos += cameraUp * movementSpeed * Time.deltaTime;
             }
             else if (keyboard.IsKeyDown(Key.ShiftLeft))
             {
-                cameraPos -= cameraUp * speed * Time.deltaTime;
+                cameraPos -= cameraUp * movementSpeed * Time.deltaTime;
             }
         }
     }

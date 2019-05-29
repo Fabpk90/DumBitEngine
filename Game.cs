@@ -50,7 +50,7 @@ namespace DumBitEngine
             
             AudioMaster.Init();
 
-            CursorVisible = true;
+            CursorVisible = false;
             VSync = VSyncMode.On;
 
             camera = new Camera(Width, Height);
@@ -72,6 +72,15 @@ namespace DumBitEngine
             base.OnResize(e);
 
             GL.Viewport(0, 0, Width, Height);
+        }
+
+        protected override void OnMouseMove(MouseMoveEventArgs e)
+        {
+            if (Focused) // check to see if the window is focused  
+            {
+                Mouse.SetPosition(X + Width/2f, Y + Height/2f);
+            }
+            base.OnMouseMove(e);
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
