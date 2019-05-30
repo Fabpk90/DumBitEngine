@@ -49,6 +49,7 @@ namespace DumBitEngine
             base.OnLoad(e);
             
             AudioMaster.Init();
+            GL.Enable(EnableCap.DepthTest);
 
             CursorVisible = false;
             VSync = VSyncMode.On;
@@ -81,6 +82,14 @@ namespace DumBitEngine
                 Mouse.SetPosition(X + Width/2f, Y + Height/2f);
             }
             base.OnMouseMove(e);
+        }
+
+        protected override void OnMouseWheel(MouseWheelEventArgs e)
+        {
+            
+            camera.UpdateFOV(e.DeltaPrecise);
+            
+            base.OnMouseWheel(e);
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)

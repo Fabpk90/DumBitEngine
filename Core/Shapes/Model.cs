@@ -180,6 +180,7 @@ namespace DumBitEngine.Core.Shapes
             shader.Use();
             
             shader.SetMatrix4("view", ref Game.mainCamera.view);
+            shader.SetMatrix4("projection", ref Game.mainCamera.projection);
             
             foreach (var mesh in meshes)
             {

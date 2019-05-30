@@ -26,7 +26,12 @@ namespace DumBitEngine.Core.Util
         private float yaw;
         private float pitch;
 
+        private float fov;
+
         public Vector3 CameraFront => cameraFront;
+
+        public float screenWidth;
+        public float screenHeight;
 
         public Camera(float screenWidth, float screenHeight)
         {
@@ -34,29 +39,45 @@ namespace DumBitEngine.Core.Util
             cameraFront = new Vector3(0, 0, -1f);
             cameraUp = new Vector3(0, 1, 0);
 
+            this.screenHeight = screenHeight;
+            this.screenWidth = screenWidth;
+
             projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(55.0f), screenWidth / screenHeight,
                 0.1f, 100f);
             view = Matrix4.LookAt(cameraPos, cameraFront + cameraPos, cameraUp);
 
             previousMousePos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
-            Console.WriteLine("starting position " + previousMousePos);
 
             movementSpeed = 1.5f;
 
             yaw = pitch = 0.0f;
             mouseSensitivity = .25f;
+            fov = 45f;
+        }
+
+        public void UpdateFOV(float amount)
+        {
+            
+            if ( fov - amount >= 45f)
+                fov = 45f;
+            else if (fov - amount <= 1f)
+                fov = 1f;
+            else
+                fov -= amount;
+            
+            Console.WriteLine(fov);
+            
+            projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(fov), screenWidth / screenHeight,
+                0.1f, 100f);
         }
 
         private void UpdateCameraLook()
         {
             Vector2 position = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
-            Console.WriteLine("position " + position);
             if(position != previousMousePos)
             {
                 Vector2 deltaPos = previousMousePos - position;
 
-                Console.WriteLine("deltaPos " + deltaPos);
-                
                 previousMousePos = position;
 
                 yaw += -deltaPos.X * mouseSensitivity;
@@ -66,8 +87,6 @@ namespace DumBitEngine.Core.Util
                     pitch = 89f;
                 else if (pitch <= -89f)
                     pitch = -89f;
-
-               
             }  
             
             //this is outside of the if statement cause inside it causes a violent motion

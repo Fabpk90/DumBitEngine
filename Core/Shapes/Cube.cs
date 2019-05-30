@@ -118,6 +118,7 @@ namespace DumBitEngine.Core.Shapes
 
             shaderProgram.SetMatrix4("transform", ref transform);
             shaderProgram.SetMatrix4("view", ref Game.mainCamera.view);
+            shaderProgram.SetMatrix4("projection", ref Game.mainCamera.projection);
 
             GL.DrawElements(PrimitiveType.Triangles, index.Length, DrawElementsType.UnsignedInt, 0);
         }
