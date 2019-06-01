@@ -25,10 +25,13 @@ in vec3 aColor;
 in vec2 aTexCoord;
 
 uniform sampler2D tex0;
+uniform vec3 lightColor;
 
 out vec4 color;
 
 void main()
 {
-    color = texture(tex0, aTexCoord) * vec4(aColor, 1.0);
+    float ambientStrength = 0.1f;
+    vec3 ambientColor = ambientStrength * lightColor;
+    color = texture(tex0, aTexCoord) * vec4(aColor * ambientColor, 1.0);
 }

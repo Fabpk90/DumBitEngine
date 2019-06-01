@@ -6,8 +6,8 @@ namespace DumBitEngine.Core.Util
 {
     public class LightSource : Entity
     {
-        private Matrix4 transform;
-        private Vector3 color;
+        public Matrix4 transform;
+        public Vector3 color;
         
         private uint[] index;
         private float[] vertex;
@@ -81,9 +81,20 @@ namespace DumBitEngine.Core.Util
         {
             shader.Use();
             shader.SetMatrix4("view", ref Game.mainCamera.view);
+            shader.SetMatrix4("projection", ref Game.mainCamera.projection);
             GL.BindVertexArray(vao);
             
             GL.DrawElements(PrimitiveType.Triangles, index.Length, DrawElementsType.UnsignedInt, 0);
+        }
+
+        public override void Awake()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Start()
+        {
+            throw new NotImplementedException();
         }
 
         public override void Dispose()

@@ -30,19 +30,17 @@ namespace DumBitEngine.Core.Util
 
         public Vector3 CameraFront => cameraFront;
 
-        public float screenWidth;
-        public float screenHeight;
+        public float aspectRatio;
 
-        public Camera(float screenWidth, float screenHeight)
+        public Camera(float aspectRatio)
         {
             cameraPos = new Vector3(0, 0, 10f);
             cameraFront = new Vector3(0, 0, -1f);
             cameraUp = new Vector3(0, 1, 0);
 
-            this.screenHeight = screenHeight;
-            this.screenWidth = screenWidth;
+            this.aspectRatio = aspectRatio;
 
-            projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(55.0f), screenWidth / screenHeight,
+            projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(55.0f), aspectRatio,
                 0.1f, 100f);
             view = Matrix4.LookAt(cameraPos, cameraFront + cameraPos, cameraUp);
 
@@ -64,10 +62,9 @@ namespace DumBitEngine.Core.Util
                 fov = 1f;
             else
                 fov -= amount;
-            
-            Console.WriteLine(fov);
-            
-            projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(fov), screenWidth / screenHeight,
+
+            projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(fov),
+                aspectRatio,
                 0.1f, 100f);
         }
 

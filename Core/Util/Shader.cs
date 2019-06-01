@@ -120,14 +120,19 @@ namespace DumBitEngine.Core.Util
         {
             GL.Uniform3(GL.GetUniformLocation(ProgramId, name), ref vector);
         }
+        
+        public void SetVector3(string name, Vector3 vector)
+        {
+            GL.Uniform3(GL.GetUniformLocation(ProgramId, name), vector);
+        }
 
         public void Dispose()
         {  
             if (AssetLoader.RemoveElement(path))
             {
                 GL.DeleteProgram(ProgramId);
-               
-                Console.WriteLine("Unloading shader at: "+path);
+
+                Console.WriteLine("Unloading shader at: " + path);
             }       
         }
     }

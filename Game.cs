@@ -16,7 +16,8 @@ namespace DumBitEngine
         private Model model;
         private Cube cube;
 
-        private Scene scene;
+        public static Scene scene;
+        public static LightSource light;
 
         public static Camera mainCamera;
 
@@ -54,17 +55,19 @@ namespace DumBitEngine
             CursorVisible = false;
             VSync = VSyncMode.On;
 
-            camera = new Camera(Width, Height);
+            camera = new Camera(Width / Height);
             mainCamera = camera;
 
+            light = new LightSource();
             model = new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj");
             cube = new Cube("Assets/container.jpg");
+            
 
             scene = new Scene();
             scene.AddEntity(model);
             scene.AddEntity(cube);
             
-            scene.AddEntity(new LightSource());
+            scene.AddEntity(light);
 
         }
 

@@ -23,8 +23,6 @@ namespace DumBitEngine.Core.Shapes
         private float[] vertex;
         private uint[] index;
 
-        private Matrix4 transform;
-
         public Cube(string texturePath)
         {
             index = new uint[]
@@ -46,7 +44,7 @@ namespace DumBitEngine.Core.Shapes
 
             vertex = new float[]
             {
-                //pos           //color
+                //pos                   //color        //texcoord
                 0.5f, 0.5f, 0.5f,     .9f, .59f, .7f, 1.0f, 1.0f, // top right
                 0.5f, -0.5f, 0.5f,    .5f, .6f, .68f, 1.0f, 0.0f, // bottom right
                 -0.5f, -0.5f, 0.5f,   .5f, .57f, .69f, 0.0f, 0.0f, // bottom left
@@ -54,7 +52,7 @@ namespace DumBitEngine.Core.Shapes
                 0.5f, 0.5f, -0.5f,    .5f, .6f, .7f, 1.0f, 1.0f,
                 0.5f, -0.5f, -0.5f,   .5f, .58f, .67f, 1.0f, 0.0f,
                 -0.5f, -0.5f, -0.5f,  .5f, .6f, .675f, 0.0f, 0.0f,
-                -0.5f, 0.5f, -0.5f,   .5f, .55f, .69f, 0.0f, 1.0f,
+                -0.5f, 0.5f, -0.5f,   .5f, .55f, .69f, 0.0f, 1.0f
             };
             
             transform = Matrix4.Identity;
@@ -96,6 +94,16 @@ namespace DumBitEngine.Core.Shapes
             shaderProgram.SetInt("tex0", 0);
         }
 
+        public override void Awake()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Start()
+        {
+            throw new NotImplementedException();
+        }
+
         public override void Dispose()
         {
             shaderProgram.Dispose();
@@ -119,6 +127,8 @@ namespace DumBitEngine.Core.Shapes
             shaderProgram.SetMatrix4("transform", ref transform);
             shaderProgram.SetMatrix4("view", ref Game.mainCamera.view);
             shaderProgram.SetMatrix4("projection", ref Game.mainCamera.projection);
+            
+            shaderProgram.SetVector3("lightColor", ref Game.light.color);
 
             GL.DrawElements(PrimitiveType.Triangles, index.Length, DrawElementsType.UnsignedInt, 0);
         }

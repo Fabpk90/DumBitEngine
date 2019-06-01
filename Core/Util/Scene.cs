@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DumBitEngine.Core.Util
 {
-    class Scene : Entity
+    public class Scene : Entity
     {
         private List<Entity> sceneGraph;
 
@@ -18,6 +18,22 @@ namespace DumBitEngine.Core.Util
         public void AddEntity(Entity entity)
         {
             sceneGraph.Add(entity);
+        }
+
+        public override void Awake()
+        {
+            foreach (Entity entity in sceneGraph)
+            {
+                entity.Awake();
+            }
+        }
+
+        public override void Start()
+        {
+            foreach (Entity entity in sceneGraph)
+            {
+                entity.Start();
+            }
         }
 
         public override void Dispose()
