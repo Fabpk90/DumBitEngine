@@ -4,8 +4,9 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using OpenTK.Graphics.OpenGL;
-using StbSharp;
-using Image = StbSharp.Image;
+using SixLabors.ImageSharp.Advanced;
+using SixLabors.ImageSharp.Formats;
+using Image = SixLabors.ImageSharp.Image;
 using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 
 namespace DumBitEngine.Core.Util
@@ -35,13 +36,16 @@ namespace DumBitEngine.Core.Util
                 this.path = path;
                 this.type = type;
             
+                GL.ActiveTexture(TextureUnit.Texture0);
                 GL.GenTextures(1, out id);
                 GL.BindTexture(TextureTarget.Texture2D, id);
 
-                ImageReader reader = new ImageReader();
                 var stream = File.OpenRead(path);
-            
-                var img = reader.Read(stream);
+
+                IImageFormat config;
+                var img = Image.Load(stream, out config);
+                
+                
                 stream.Close();
 
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int) TextureWrapMode.Repeat);
@@ -52,9 +56,9 @@ namespace DumBitEngine.Core.Util
                     (int) TextureMinFilter.Linear);
 
                 GL.TexImage2D(TextureTarget.Texture2D, 0,
-                    img.Comp == 3 ? PixelInternalFormat.Rgb : PixelInternalFormat.Rgba
+                     PixelInternalFormat.Rgba
                     , img.Width, img.Height, 0,
-                    PixelFormat.Rgba, PixelType.UnsignedByte, img.Data);
+                    PixelFormat.Rgba, PixelType.UnsignedByte, img.GetPixelSpan().ToArray());
 
                 GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 

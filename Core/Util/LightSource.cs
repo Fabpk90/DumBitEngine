@@ -79,10 +79,12 @@ namespace DumBitEngine.Core.Util
         
         public override void Draw()
         {
+            GL.BindVertexArray(vao);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
             shader.Use();
             shader.SetMatrix4("view", ref Game.mainCamera.view);
             shader.SetMatrix4("projection", ref Game.mainCamera.projection);
-            GL.BindVertexArray(vao);
+            
             
             GL.DrawElements(PrimitiveType.Triangles, index.Length, DrawElementsType.UnsignedInt, 0);
         }

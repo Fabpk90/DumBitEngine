@@ -8,6 +8,7 @@ using System;
 using System.Drawing;
 using DumBitEngine.Core.Sound;
 using ImGuiNET;
+using Vector2 = System.Numerics.Vector2;
 
 namespace DumBitEngine
 {
@@ -20,11 +21,15 @@ namespace DumBitEngine
         public static LightSource light;
 
         public static Camera mainCamera;
+        public static Vector2 mousePosition;
 
         private Camera camera;
-        private ImGuiIOPtr _io;
+        private ImGuiController imguiController;
+        private InputState inputState;
 
-       /* TODO add a real camera class - add a menu of some sort
+        public static bool isCursorVisible = false;
+
+       /* TODO add a menu of some sort
             optimize the handling of vertices (store only the vertices and different transform for each)
         */
 
@@ -47,21 +52,20 @@ namespace DumBitEngine
 
         protected override void OnLoad(EventArgs e)
         {
-            base.OnLoad(e);
-            
             AudioMaster.Init();
             GL.Enable(EnableCap.DepthTest);
 
-            CursorVisible = false;
+            isCursorVisible = CursorVisible = false;
             VSync = VSyncMode.On;
 
             camera = new Camera(Width / Height);
             mainCamera = camera;
 
+            imguiController = new ImGuiController("Assets/Shaders/imgui.glsl", Width, Height);
+            
             light = new LightSource();
             model = new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj");
             cube = new Cube("Assets/container.jpg");
-            
 
             scene = new Scene();
             scene.AddEntity(model);
@@ -69,18 +73,45 @@ namespace DumBitEngine
             
             scene.AddEntity(light);
 
+            base.OnLoad(e);
         }
 
         protected override void OnResize(EventArgs e)
         {
-            base.OnResize(e);
-
             GL.Viewport(0, 0, Width, Height);
+            base.OnResize(e);
+        }
+
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            base.OnMouseDown(e);
+
+            if (e.Button == MouseButton.Right)
+            {
+                isCursorVisible = CursorVisible = !CursorVisible;
+                camera.SetMousePosition(new OpenTK.Vector2(Mouse.GetState().X, Mouse.GetState().Y));
+            }
+            else if (e.Button == MouseButton.Left)
+            {
+                inputState.isClicked = true;
+            }
+                
+        }
+
+        protected override void OnMouseUp(MouseButtonEventArgs e)
+        {
+            base.OnMouseUp(e);
+
+            if (e.Button == MouseButton.Left)
+                inputState.isClicked = false;
         }
 
         protected override void OnMouseMove(MouseMoveEventArgs e)
         {
-            if (Focused) // check to see if the window is focused  
+            mousePosition.X = e.Position.X;
+            mousePosition.Y = e.Position.Y;
+            
+            if (Focused && !CursorVisible) // check to see if the window is focused  
             {
                 Mouse.SetPosition(X + Width/2f, Y + Height/2f);
             }
@@ -89,22 +120,21 @@ namespace DumBitEngine
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)
         {
-            
             camera.UpdateFOV(e.DeltaPrecise);
             
             base.OnMouseWheel(e);
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
-        {
-            
+        {  
             if (!Focused)
             {
                 return;
             }
 
             Time.deltaTime = (float) e.Time;
-            base.OnUpdateFrame(e);
+
+
             HandleInput();
 
             Title = "DumBit Engine: FPS " + (1f / e.Time).ToString("00");
@@ -114,7 +144,28 @@ namespace DumBitEngine
 
             scene.Draw();
 
+            ImGui.NewFrame();
+            imguiController.UpdateUI(inputState);
+
+
+            ImGui.Begin("Yes it is");
+            ImGui.Text("Testing");
+
+            if (ImGui.Button("yess"))
+            {
+                Console.WriteLine("YEESS");
+            }
+            ImGui.End();
+
+            ImGui.EndFrame();
+            ImGui.Render();
+            imguiController.DrawData();
+            
+            
+            
             SwapBuffers();
+            
+            base.OnUpdateFrame(e);
         }
 
         private void HandleInput()
@@ -131,14 +182,20 @@ namespace DumBitEngine
             if (keyboard.IsKeyDown(Key.R))
                 scene.Dispose();
 
+            if (isCursorVisible)
+            {
+                //inputState.keysPressed.Add(keyboard.);
+            }
 
             camera.Draw();
         }
 
         protected override void OnClosed(EventArgs e)
         {
-            base.OnClosed(e);
             scene.Dispose();
+            imguiController.Dispose();
+            ImGui.DestroyContext();
+            base.OnClosed(e);
         }
     }
 }

@@ -13,8 +13,6 @@ namespace DumBitEngine.Core.Shapes
         private int vbo;
         private int ebo;
 
-       // private Texture texture0;
-
         private Shader shaderProgram;
 
         private Texture texture0;
@@ -84,14 +82,8 @@ namespace DumBitEngine.Core.Shapes
             shaderProgram.SetMatrix4("projection", ref Game.mainCamera.projection);
             
            texture0 = new Texture(texturePath, "");
-            
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int) TextureWrapMode.MirroredRepeat);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int) TextureWrapMode.MirroredRepeat);
-            
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int) TextureMinFilter.LinearMipmapLinear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int) TextureMinFilter.Linear);
 
-            shaderProgram.SetInt("tex0", 0);
+           shaderProgram.SetInt("tex0", 0);
         }
 
         public override void Awake()
@@ -121,15 +113,19 @@ namespace DumBitEngine.Core.Shapes
             transform *= Matrix4.CreateRotationY(Time.deltaTime);
             transform *= Matrix4.CreateRotationX(Time.deltaTime);
 
-            shaderProgram.Use();
+            
             GL.BindVertexArray(vao);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
 
+            shaderProgram.Use();
             shaderProgram.SetMatrix4("transform", ref transform);
             shaderProgram.SetMatrix4("view", ref Game.mainCamera.view);
             shaderProgram.SetMatrix4("projection", ref Game.mainCamera.projection);
             
             shaderProgram.SetVector3("lightColor", ref Game.light.color);
-
+            
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D ,texture0.id);
             GL.DrawElements(PrimitiveType.Triangles, index.Length, DrawElementsType.UnsignedInt, 0);
         }
     }

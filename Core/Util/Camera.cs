@@ -68,6 +68,11 @@ namespace DumBitEngine.Core.Util
                 0.1f, 100f);
         }
 
+        public void SetMousePosition(Vector2 position)
+        {
+            previousMousePos = position;
+        }
+        
         private void UpdateCameraLook()
         {
             Vector2 position = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
@@ -102,7 +107,8 @@ namespace DumBitEngine.Core.Util
 
         public void Draw()
         {
-            UpdateCameraLook();
+            if(!Game.isCursorVisible)
+                UpdateCameraLook();
 
             view = Matrix4.LookAt(cameraPos, cameraFront + cameraPos, cameraUp);
         }

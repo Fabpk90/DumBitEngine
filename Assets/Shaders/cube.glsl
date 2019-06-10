@@ -31,7 +31,7 @@ out vec4 color;
 
 void main()
 {
-    float ambientStrength = 0.1f;
+    float ambientStrength = 1.0f;
     vec3 ambientColor = ambientStrength * lightColor;
-    color = texture(tex0, aTexCoord) * vec4(aColor * ambientColor, 1.0);
+    color = vec4(aColor * ambientColor, 1.0) * texture(tex0, aTexCoord) ;
 }
