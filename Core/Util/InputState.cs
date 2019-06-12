@@ -5,10 +5,22 @@ using Vector2 = System.Numerics.Vector2;
 
 namespace DumBitEngine.Core.Util
 {
-    public struct InputState
+    public class InputState
     {
-        public List<Key> keysPressed;
+        public KeyboardState keyboard;
 
         public bool isClicked;
+        public bool isBeenClicked;
+        public bool isClickedDown;
+
+        public InputState()
+        {
+            isClicked = isBeenClicked = isClicked =  isClickedDown = false;
+        }
+
+        public void Update(KeyboardState updatedKeyboard)
+        {
+            keyboard = updatedKeyboard;
+        }
     }
 }

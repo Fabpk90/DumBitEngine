@@ -11,7 +11,7 @@ using Vector4 = System.Numerics.Vector4;
 
 namespace DumBitEngine.Core.Util
 {
-    public class ImGuiController : IDisposable
+    public class ImGuiRenderer : IDisposable
     {
         private Shader shader;
 
@@ -31,7 +31,7 @@ namespace DumBitEngine.Core.Util
         private ImGuiIOPtr io;
         private Matrix4x4 projectionMatrix;
 
-        public ImGuiController(string shaderPath, int width, int height)
+        public ImGuiRenderer(string shaderPath, int width, int height)
         {
             shader = new Shader(shaderPath);
 
@@ -75,6 +75,7 @@ namespace DumBitEngine.Core.Util
             GenerateBuffers();
             SetKeyMappings();
             
+            ImGui.NewFrame();
         }
 
         private void GenerateBuffers()
@@ -243,22 +244,6 @@ namespace DumBitEngine.Core.Util
             GL.DeleteTexture(textureID);
         }
 
-        public void UpdateUI(InputState inputState)
-        {
-            io.DeltaTime = Time.deltaTime;
-
-            if (Game.isCursorVisible)
-            {
-                io.MousePos = Game.mousePosition;
-                if (inputState.isClicked)
-                {
-                    Console.WriteLine("mouse clicked");
-                }
-                io.MouseClicked[0] = inputState.isClicked;
-
-                //Console.WriteLine(io.MousePos);
-            }
-            
-        }
+       
     }
 }

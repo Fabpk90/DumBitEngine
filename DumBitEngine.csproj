@@ -104,7 +104,8 @@
     <Compile Include="Core\Util\Camera.cs" />
     <Compile Include="Core\Util\Entity.cs" />
     <Compile Include="Core\Util\IDisposable.cs" />
-    <Compile Include="Core\Util\ImGuiController.cs" />
+    <Compile Include="Core\Util\ImGuiInput.cs" />
+    <Compile Include="Core\Util\ImGuiRenderer.cs" />
     <Compile Include="Core\Util\InputState.cs" />
     <Compile Include="Core\Util\IRenderable.cs" />
     <Compile Include="Core\Util\LightSource.cs" />

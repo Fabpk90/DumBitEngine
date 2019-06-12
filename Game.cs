@@ -24,17 +24,20 @@ namespace DumBitEngine
         public static Vector2 mousePosition;
 
         private Camera camera;
-        private ImGuiController imguiController;
+        private ImGuiRenderer imguiRenderer;
+        private ImGuiInput imguiInput;
         private InputState inputState;
 
-        public static bool isCursorVisible = false;
+        public static bool isCursorVisible;
+
+        private string testingInput;
 
        /* TODO add a menu of some sort
             optimize the handling of vertices (store only the vertices and different transform for each)
         */
 
-        public Game() : base(640, // initial width
-            480, // initial height
+        public Game() : base(1280, // initial width
+            720, // initial height
             GraphicsMode.Default,
             "DumBit Engine", 
             GameWindowFlags.Default,
@@ -61,7 +64,7 @@ namespace DumBitEngine
             camera = new Camera(Width / Height);
             mainCamera = camera;
 
-            imguiController = new ImGuiController("Assets/Shaders/imgui.glsl", Width, Height);
+            imguiRenderer = new ImGuiRenderer("Assets/Shaders/imgui.glsl", Width, Height);
             
             light = new LightSource();
             model = new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj");
@@ -73,6 +76,10 @@ namespace DumBitEngine
             
             scene.AddEntity(light);
 
+            testingInput = "";
+            inputState = new InputState();
+            imguiInput = new ImGuiInput();
+            
             base.OnLoad(e);
         }
 
@@ -84,8 +91,6 @@ namespace DumBitEngine
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
-            base.OnMouseDown(e);
-
             if (e.Button == MouseButton.Right)
             {
                 isCursorVisible = CursorVisible = !CursorVisible;
@@ -94,7 +99,16 @@ namespace DumBitEngine
             else if (e.Button == MouseButton.Left)
             {
                 inputState.isClicked = true;
+
+                if (!inputState.isBeenClicked)
+                {
+                    inputState.isClickedDown = true;
+                    inputState.isBeenClicked = true;
+                }
+                    
             }
+            
+            base.OnMouseDown(e);
                 
         }
 
@@ -103,7 +117,12 @@ namespace DumBitEngine
             base.OnMouseUp(e);
 
             if (e.Button == MouseButton.Left)
+            {
                 inputState.isClicked = false;
+
+                inputState.isBeenClicked = false;
+                inputState.isClickedDown = false;
+            }
         }
 
         protected override void OnMouseMove(MouseMoveEventArgs e)
@@ -133,7 +152,7 @@ namespace DumBitEngine
             }
 
             Time.deltaTime = (float) e.Time;
-
+            inputState.Update(Keyboard.GetState());
 
             HandleInput();
 
@@ -145,7 +164,7 @@ namespace DumBitEngine
             scene.Draw();
 
             ImGui.NewFrame();
-            imguiController.UpdateUI(inputState);
+            imguiInput.UpdateUI(ref inputState);
 
 
             ImGui.Begin("Yes it is");
@@ -155,11 +174,17 @@ namespace DumBitEngine
             {
                 Console.WriteLine("YEESS");
             }
+
+            if (ImGui.InputText("Test", ref testingInput, 10))
+            {
+                Console.WriteLine("Buffer has " + testingInput);
+            }
+            
             ImGui.End();
 
             ImGui.EndFrame();
             ImGui.Render();
-            imguiController.DrawData();
+            imguiRenderer.DrawData();
             
             
             
@@ -174,17 +199,17 @@ namespace DumBitEngine
 
             if (keyboard.IsKeyDown(Key.Escape))
                 Exit();
-
-            mainCamera.InputUpdate(keyboard);
-
-            if (keyboard.IsKeyDown(Key.E))
-                scene.AddEntity(new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj"));
-            if (keyboard.IsKeyDown(Key.R))
-                scene.Dispose();
-
             if (isCursorVisible)
             {
-                //inputState.keysPressed.Add(keyboard.);
+            }
+            else
+            {
+                mainCamera.InputUpdate(keyboard);
+
+                if (keyboard.IsKeyDown(Key.E))
+                    scene.AddEntity(new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj"));
+                if (keyboard.IsKeyDown(Key.R))
+                    scene.Dispose();
             }
 
             camera.Draw();
@@ -193,7 +218,7 @@ namespace DumBitEngine
         protected override void OnClosed(EventArgs e)
         {
             scene.Dispose();
-            imguiController.Dispose();
+            imguiRenderer.Dispose();
             ImGui.DestroyContext();
             base.OnClosed(e);
         }
