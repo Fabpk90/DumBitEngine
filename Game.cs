@@ -26,7 +26,6 @@ namespace DumBitEngine
         private Camera camera;
         private ImGuiRenderer imguiRenderer;
         private ImGuiInput imguiInput;
-        private InputState inputState;
 
         public static bool isCursorVisible;
 
@@ -77,8 +76,12 @@ namespace DumBitEngine
             scene.AddEntity(light);
 
             testingInput = "";
-            inputState = new InputState();
             imguiInput = new ImGuiInput();
+            
+            Input.Init();
+            MouseDown += (sender, args) => Input.MouseEvent(args);
+            MouseUp += (sender, args) => Input.MouseEvent(args);
+            MouseMove += (sender, args) => Input.MouseEvent(args);
             
             base.OnLoad(e);
         }
@@ -98,31 +101,18 @@ namespace DumBitEngine
             }
             else if (e.Button == MouseButton.Left)
             {
-                inputState.isClicked = true;
+                /*inputState.isClicked = true;
 
                 if (!inputState.isBeenClicked)
                 {
                     inputState.isClickedDown = true;
                     inputState.isBeenClicked = true;
-                }
+                }*/
                     
             }
             
             base.OnMouseDown(e);
                 
-        }
-
-        protected override void OnMouseUp(MouseButtonEventArgs e)
-        {
-            base.OnMouseUp(e);
-
-            if (e.Button == MouseButton.Left)
-            {
-                inputState.isClicked = false;
-
-                inputState.isBeenClicked = false;
-                inputState.isClickedDown = false;
-            }
         }
 
         protected override void OnMouseMove(MouseMoveEventArgs e)
@@ -152,7 +142,8 @@ namespace DumBitEngine
             }
 
             Time.deltaTime = (float) e.Time;
-            inputState.Update(Keyboard.GetState());
+            //inputState.Update(Keyboard.GetState());
+            Input.Update();
 
             HandleInput();
 
@@ -164,7 +155,7 @@ namespace DumBitEngine
             scene.Draw();
 
             ImGui.NewFrame();
-            imguiInput.UpdateUI(ref inputState);
+            imguiInput.UpdateUI();
 
 
             ImGui.Begin("Yes it is");

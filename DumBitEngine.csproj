@@ -106,7 +106,7 @@
     <Compile Include="Core\Util\IDisposable.cs" />
     <Compile Include="Core\Util\ImGuiInput.cs" />
     <Compile Include="Core\Util\ImGuiRenderer.cs" />
-    <Compile Include="Core\Util\InputState.cs" />
+    <Compile Include="Core\Util\Input.cs" />
     <Compile Include="Core\Util\IRenderable.cs" />
     <Compile Include="Core\Util\LightSource.cs" />
     <Compile Include="Core\Util\Scene.cs" />

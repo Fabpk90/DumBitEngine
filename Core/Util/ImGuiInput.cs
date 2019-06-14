@@ -14,29 +14,19 @@ namespace DumBitEngine.Core.Util
             io = ImGui.GetIO();
         }
         
-        public void UpdateUI(ref InputState inputState)
+        public void UpdateUI()
         {
             io.DeltaTime = Time.deltaTime;
 
             if (Game.isCursorVisible)
             {
-                io.MousePos = Game.mousePosition;
-                io.MouseDown[0] = inputState.isClicked;
+                io.MousePos = Input.MousePosition;
+                io.MouseDown[0] = Input.IsLeftMouseButtonDown;
 
-                if (inputState.keyboard.IsAnyKeyDown)
+                if (Input.GetKeyPressed(out Key keyPressed))
                 {
-                    var keyboard = inputState.keyboard;
-                    //goes from A to Z (enum of opentk)
-                    for (int i = 83; i < 109; i++)
-                    {
-                        if (keyboard.IsKeyDown((Key) i))
-                        {
-                            char c = (char)(i + 14);
-                            io.AddInputCharacter(c);
-
-                            Console.WriteLine(c);
-                        }
-                    }
+                    char c = (char) (keyPressed + 14);
+                    io.AddInputCharacter(c);
                 }
                 
             }
