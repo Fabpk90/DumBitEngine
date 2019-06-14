@@ -186,20 +186,19 @@ namespace DumBitEngine
 
         private void HandleInput()
         {
-            KeyboardState keyboard = Keyboard.GetState();
 
-            if (keyboard.IsKeyDown(Key.Escape))
+            if (Input.IsKeyPressed(Key.Escape))
                 Exit();
             if (isCursorVisible)
             {
             }
             else
             {
-                mainCamera.InputUpdate(keyboard);
+                mainCamera.InputUpdate();
 
-                if (keyboard.IsKeyDown(Key.E))
+                if (Input.IsKeyPressed(Key.E))
                     scene.AddEntity(new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj"));
-                if (keyboard.IsKeyDown(Key.R))
+                if (Input.IsKeyPressed(Key.R))
                     scene.Dispose();
             }
 

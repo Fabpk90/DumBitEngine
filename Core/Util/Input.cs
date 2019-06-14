@@ -9,8 +9,11 @@ namespace DumBitEngine.Core.Util
 {
     public static class Input
     {
-        public static bool[] keyDown;
-        public static bool[] keyDownLastFrame;
+        private static bool[] keyPressed;
+        private static bool[] keyPressedLastFrame;
+
+        private static bool[] keyDown;
+        private static bool[] keyDownCanBeActivated;
         
         private const int MAX_KEY_SIZE = (int) Key.NonUSBackSlash;
 
@@ -24,30 +27,66 @@ namespace DumBitEngine.Core.Util
 
         public static void Init()
         {
+            keyPressed = new bool[MAX_KEY_SIZE];
             keyDown = new bool[MAX_KEY_SIZE];
-            keyDownLastFrame = keyDown;
+            keyPressedLastFrame = new bool[MAX_KEY_SIZE];
+            keyDownCanBeActivated = new bool[MAX_KEY_SIZE];
+
+            //by default, all keys can activated for one time press
+            for (int i = 0; i < MAX_KEY_SIZE; i++)
+            {
+                keyDownCanBeActivated[i] = true;
+            }
 
             keyboardStateLastFrame = Keyboard.GetState();
         }
 
+        /// <summary>
+        /// Update the state of the keyDown and keyPressed buffer
+        /// </summary>
         public static void Update()
         {
             keyboardState = Keyboard.GetState();
 
-            if (keyboardState.IsAnyKeyDown)
+            for (int i = 0; i < MAX_KEY_SIZE; i++)
             {
-                for (int i = 0; i < MAX_KEY_SIZE; i++)
+                keyPressed[i] = keyboardState.IsKeyDown((Key) i);
+
+                if (keyPressed[i] == false)
                 {
-                    keyDown[i] = keyboardState.IsKeyDown((Key) i);
+                    keyDown[i] = false;
+                    keyDownCanBeActivated[i] = true;
+                }
+                else if (keyPressed[i] == true)
+                {
+                    if(keyDown[i] == false && keyDownCanBeActivated[i])
+                    {
+                        keyDown[i] = true;
+                        keyDownCanBeActivated[i] = false;
+                    }
+                    else if (keyDown[i])
+                    {
+                        keyDown[i] = false;
+                    }
                 }
             }
         }
 
         public static bool IsKeyPressed(Key key)
         {
+            return keyPressed[(int) key];
+        }
+
+        public static bool IsKeyDown(Key key)
+        {
             return keyDown[(int) key];
         }
 
+        /// <summary>
+        /// Retrieves the first key pressed during this frame
+        /// </summary>
+        /// <param name="keyPressed"></param>
+        /// <returns>The key pressed during the frame</returns>
         public static bool GetKeyPressed(out Key keyPressed)
         {
             if (keyboardState.IsAnyKeyDown)

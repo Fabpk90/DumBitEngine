@@ -25,8 +25,17 @@ namespace DumBitEngine.Core.Util
 
                 if (Input.GetKeyPressed(out Key keyPressed))
                 {
-                    char c = (char) (keyPressed + 14);
-                    io.AddInputCharacter(c);
+                    if (keyPressed == Key.BackSpace)
+                    {
+                        io.KeysDown[(int) Key.BackSpace] = true;
+                    }
+                    else
+                    {
+                        io.KeysDown[(int) Key.BackSpace] = false;
+                        char c = (char) (keyPressed + 14);
+                        io.AddInputCharacter(c);
+                    }
+                    
                 }
                 
             }

@@ -113,31 +113,31 @@ namespace DumBitEngine.Core.Util
             view = Matrix4.LookAt(cameraPos, cameraFront + cameraPos, cameraUp);
         }
 
-        public void InputUpdate(KeyboardState keyboard)
+        public void InputUpdate()
         {
-            if (keyboard.IsKeyDown(Key.Up))
+            if (Input.IsKeyPressed(Key.Up))
             {
                 cameraPos += CameraFront * movementSpeed * Time.deltaTime;
             }
-            else if (keyboard.IsKeyDown(Key.Down))
+            else if (Input.IsKeyPressed(Key.Down))
             {
                 cameraPos -= CameraFront * movementSpeed * Time.deltaTime;
             }
 
-            if (keyboard.IsKeyDown(Key.Left))
+            if (Input.IsKeyPressed(Key.Left))
             {
                 cameraPos -= Vector3.Normalize(Vector3.Cross(cameraFront, cameraUp)) * movementSpeed * Time.deltaTime;
             }
-            else if (keyboard.IsKeyDown(Key.Right))
+            else if (Input.IsKeyPressed(Key.Right))
             {
                 cameraPos += Vector3.Normalize(Vector3.Cross(cameraFront, cameraUp)) * movementSpeed * Time.deltaTime;
             }
             
-            if (keyboard.IsKeyDown(Key.Space))
+            if (Input.IsKeyPressed(Key.Space))
             {
                 cameraPos += cameraUp * movementSpeed * Time.deltaTime;
             }
-            else if (keyboard.IsKeyDown(Key.ShiftLeft))
+            else if (Input.IsKeyPressed(Key.ShiftLeft))
             {
                 cameraPos -= cameraUp * movementSpeed * Time.deltaTime;
             }
