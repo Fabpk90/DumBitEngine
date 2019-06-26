@@ -117,6 +117,9 @@ namespace DumBitEngine.Core.Util
 
         public void DrawData()
         {
+            if(ImGui.GetDrawData().TotalVtxCount  == 0)
+                return;
+            
             GL.Enable(EnableCap.Blend);
             GL.Enable(EnableCap.ScissorTest);
             GL.BlendEquation(BlendEquationMode.FuncAdd);
@@ -131,17 +134,18 @@ namespace DumBitEngine.Core.Util
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
 
             shader.Use();
-            shader.SetMatrix4("projection_matrix", ref projectionMatrix);
-            shader.SetInt("FontTexture", 0);
+
             var data = ImGui.GetDrawData();
             if (data.Valid)
             { 
                 UpdateBuffers(data);
+                int idx_offset = 0;
+                int vtxOffset = 0;
+               
+                //Console.WriteLine(data.CmdListsCount);
                 for (int i = 0; i < data.CmdListsCount; i++)
                 {
                     ImDrawListPtr cmd_list = data.CmdListsRange[i];
-
-                    int idx_offset = 0;
                     
                     for (int j = 0; j < cmd_list.CmdBuffer.Size; j++)
                     {
@@ -154,17 +158,34 @@ namespace DumBitEngine.Core.Util
 
                         if (pcmd.TextureId != IntPtr.Zero)
                         {
-                            GL.ActiveTexture(TextureUnit.Texture0);
+                            //GL.ActiveTexture(TextureUnit.Texture0);
                             GL.BindTexture(TextureTarget.Texture2D , pcmd.TextureId.ToInt32());
                         }
 
-                        GL.DrawElements(PrimitiveType.Triangles, (int) pcmd.ElemCount, DrawElementsType.UnsignedShort,
-                            idx_offset * sizeof(ushort));
+                        
+                        int baseVertex = vtxOffset;
+                        int minVertexIndex = 0;
+                        int numVertices = cmd_list.VtxBuffer.Size;
+                        int numIndices = cmd_list.IdxBuffer.Size;
+                        int startIndex = idx_offset;
+                    
+                        GL.DrawRangeElementsBaseVertex(PrimitiveType.Triangles,
+                            minVertexIndex,
+                            minVertexIndex + numVertices - 1,
+                            (int)pcmd.ElemCount,
+                            DrawElementsType.UnsignedShort,
+                            (IntPtr)(startIndex * sizeof(ushort)),
+                            baseVertex);
 
                         idx_offset += (int)pcmd.ElemCount;
+                        
                     }
+
+                    vtxOffset += cmd_list.VtxBuffer.Size;
                 }
             }
+
+           
             
             GL.Enable(EnableCap.DepthTest);
            // GL.Enable(EnableCap.CullFace);
@@ -175,7 +196,7 @@ namespace DumBitEngine.Core.Util
 
         private void UpdateBuffers(ImDrawDataPtr data)
         {
-            int totalVBSize = (data.TotalVtxCount * Unsafe.SizeOf<ImDrawVert>());
+            int totalVBSize = (data.TotalVtxCount * Marshal.SizeOf<ImDrawVert>());
             if (totalVBSize > sizeVertex)
             {
                 sizeVertex = (int) (totalVBSize * 1.5f);
@@ -200,10 +221,10 @@ namespace DumBitEngine.Core.Util
             {
                 ImDrawListPtr cmd_list = data.CmdListsRange[i];
 
-                GL.BufferSubData(BufferTarget.ArrayBuffer, new IntPtr(vertexOffsetInVertices * Unsafe.SizeOf<ImDrawVert>()),
-                    cmd_list.VtxBuffer.Size * Unsafe.SizeOf<ImDrawVert>(), cmd_list.VtxBuffer.Data);
+                GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr) (vertexOffsetInVertices * Marshal.SizeOf<ImDrawVert>()),
+                    cmd_list.VtxBuffer.Size * Marshal.SizeOf<ImDrawVert>(), cmd_list.VtxBuffer.Data);
                 
-                GL.BufferSubData(BufferTarget.ElementArrayBuffer, new IntPtr(indexOffsetInElements * sizeof(ushort)),
+                GL.BufferSubData(BufferTarget.ElementArrayBuffer, (IntPtr) (indexOffsetInElements * sizeof(ushort)),
                     cmd_list.IdxBuffer.Size * sizeof(ushort), cmd_list.IdxBuffer.Data);
 
                 vertexOffsetInVertices += cmd_list.VtxBuffer.Size;

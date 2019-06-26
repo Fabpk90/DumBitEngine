@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImGuiNET;
 
 namespace DumBitEngine.Core.Util
 {
@@ -46,12 +47,23 @@ namespace DumBitEngine.Core.Util
             sceneGraph.Clear();
         }
 
+        private void DrawTreeUI()
+        {
+            //ImGui.Text("Yess");
+            /*if (ImGui.TreeNode("Test"))
+            {
+                
+            }*/
+        }
+
         public override void Draw()
         {
             foreach (var entity in sceneGraph)
             {
                 entity.Draw();
             }
+            
+            DrawTreeUI();
         }
     }
 }

@@ -31,6 +31,7 @@ namespace DumBitEngine
 
         private string testingInput;
 
+        private int testingInt = 0;
        /* TODO add a menu of some sort
             optimize the handling of vertices (store only the vertices and different transform for each)
         */
@@ -99,18 +100,7 @@ namespace DumBitEngine
                 isCursorVisible = CursorVisible = !CursorVisible;
                 camera.SetMousePosition(new OpenTK.Vector2(Mouse.GetState().X, Mouse.GetState().Y));
             }
-            else if (e.Button == MouseButton.Left)
-            {
-                /*inputState.isClicked = true;
 
-                if (!inputState.isBeenClicked)
-                {
-                    inputState.isClickedDown = true;
-                    inputState.isBeenClicked = true;
-                }*/
-                    
-            }
-            
             base.OnMouseDown(e);
                 
         }
@@ -152,12 +142,13 @@ namespace DumBitEngine
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.ClearColor(Color.Black);
 
+            ImGui.NewFrame();
             scene.Draw();
 
-            ImGui.NewFrame();
+            
             imguiInput.UpdateUI();
 
-
+            ImGui.Text("sa");
             ImGui.Begin("Yes it is");
             ImGui.Text("Testing");
 
@@ -170,6 +161,9 @@ namespace DumBitEngine
             {
                 Console.WriteLine("Buffer has " + testingInput);
             }
+
+            
+            //ImGui.DragInt4()
             
             ImGui.End();
 

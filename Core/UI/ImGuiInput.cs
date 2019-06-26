@@ -37,7 +37,10 @@ namespace DumBitEngine.Core.Util
                     }
                     
                 }
-                
+                else
+                {
+                    io.KeysDown[(int) Key.BackSpace] = false;
+                }
             }
             
         }

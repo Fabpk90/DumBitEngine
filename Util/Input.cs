@@ -85,9 +85,9 @@ namespace DumBitEngine.Core.Util
         /// <summary>
         /// Retrieves the first key pressed during this frame
         /// </summary>
-        /// <param name="keyPressed"></param>
+        /// <param name="key"></param>
         /// <returns>The key pressed during the frame</returns>
-        public static bool GetKeyPressed(out Key keyPressed)
+        public static bool GetKeyPressed(out Key key)
         {
             if (keyboardState.IsAnyKeyDown)
             {
@@ -95,12 +95,12 @@ namespace DumBitEngine.Core.Util
                 {
                     if (keyDown[i])
                     {
-                        keyPressed = (Key) i;
+                        key = (Key) i;
                         return true;
                     }
                 }
             }
-            keyPressed = Key.A;
+            key = Key.A;
             return false;
         }
 
