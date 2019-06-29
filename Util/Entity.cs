@@ -1,19 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenTK;
+using System.Numerics;
+
 
 namespace DumBitEngine.Core.Util
 {
     public abstract class Entity : IRenderable, IDisposable
     {
         public bool isActive;
+        public string name;
+        
+        public Matrix4x4 transform;
+        public GameObject parent;
 
-        public Entity()
+        public Entity(string name)
         {
             isActive = true;
+            this.name = name;
         }
         
         public abstract void Awake();

@@ -166,7 +166,6 @@ namespace DumBitEngine.Core.Util
                         int baseVertex = vtxOffset;
                         int minVertexIndex = 0;
                         int numVertices = cmd_list.VtxBuffer.Size;
-                        int numIndices = cmd_list.IdxBuffer.Size;
                         int startIndex = idx_offset;
                     
                         GL.DrawRangeElementsBaseVertex(PrimitiveType.Triangles,

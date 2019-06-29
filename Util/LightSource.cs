@@ -18,7 +18,7 @@ namespace DumBitEngine.Core.Util
         private int vbo;
         private int ebo;
 
-        public LightSource()
+        public LightSource(string name) : base(name)
         {
             index = new uint[]
             {
@@ -72,7 +72,7 @@ namespace DumBitEngine.Core.Util
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
 
             shader.Use();
-            shader.SetMatrix4("projection", ref Game.mainCamera.projection);
+            shader.SetMatrix4("projection", ref Camera.main.projection);
             shader.SetMatrix4("transform", ref transform);
             shader.SetVector3("color", ref color);
         }
@@ -82,8 +82,8 @@ namespace DumBitEngine.Core.Util
             GL.BindVertexArray(vao);
             GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
             shader.Use();
-            shader.SetMatrix4("view", ref Game.mainCamera.view);
-            shader.SetMatrix4("projection", ref Game.mainCamera.projection);
+            shader.SetMatrix4("view", ref Camera.main.view);
+            shader.SetMatrix4("projection", ref Camera.main.projection);
             
             
             GL.DrawElements(PrimitiveType.Triangles, index.Length, DrawElementsType.UnsignedInt, 0);

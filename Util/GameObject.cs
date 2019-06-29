@@ -1,30 +1,69 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 using OpenTK;
 
 namespace DumBitEngine.Core.Util
 {
     public class GameObject : Entity
     {
-        public bool isActive;
-        public Matrix4 transform;
-        public List<Entity> attachedComponent;
+        private List<Entity> attachedComponent;
+        public Matrix4x4 transform;
 
-        public GameObject()
+        public GameObject(string name) : base(name)
         {
             attachedComponent = new List<Entity>();
-            transform = Matrix4.Identity;
-            isActive = true;
+            transform = Matrix4x4.Identity;
         }
 
         public void AddComponent(Entity ent)
         {
-            attachedComponent.Add(ent);
+            //checks if there is not already an entity of the same type
+            bool found = false;
+
+            for (int i = 0; i < attachedComponent.Count && !found; i++)
+            {
+                if (attachedComponent[i] == ent)
+                {
+                    found = true;
+                }
+            }
+
+            if (!found)
+            {
+                ent.parent = this;
+                attachedComponent.Add(ent);
+            }
+            else
+            {
+                Console.WriteLine("This component " + ent.name + " is already added to " + name);
+            }
+            
         }
 
-        public void RemoveComponent(Entity ent)
+        public T GetComponent<T>() where T : class
         {
-            //TODO
+            foreach (Entity entity in attachedComponent)
+            {
+                if (entity is T entity1)
+                {
+                    return entity1;
+                }
+            }
+
+            return null;
+        }
+
+        public void RemoveComponent<T>()
+        {
+            for (int i = 0; i < attachedComponent.Count; i++)
+            {
+                if (attachedComponent[i] is T)
+                {
+                    attachedComponent.RemoveAt(i);
+                }
+            }
         }
 
         public override void Awake()

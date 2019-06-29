@@ -60,6 +60,7 @@
       <HintPath>packages\ImGui.NET.1.70.0\lib\netstandard2.0\ImGui.NET.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="mscorlib" />
     <Reference Include="OpenTK, Version=3.0.1.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
       <HintPath>packages\OpenTK.3.0.1\lib\net20\OpenTK.dll</HintPath>
@@ -98,11 +99,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Input\EventSystem.cs" />
+    <Compile Include="Core\Input\MasterInput.cs" />
     <Compile Include="Core\Shapes\Cube.cs" />
     <Compile Include="Core\Shapes\Mesh.cs" />
     <Compile Include="Core\Shapes\Model.cs" />
     <Compile Include="Core\Shapes\Shape.cs" />
     <Compile Include="Core\Sound\AudioMaster.cs" />
+    <Compile Include="Core\Sound\SoundClip.cs" />
+    <Compile Include="Core\Sound\Source.cs" />
     <Compile Include="Core\UI\ImGuiInput.cs" />
     <Compile Include="Core\UI\ImGuiRenderer.cs" />
     <Compile Include="Game.cs" />
@@ -112,8 +117,6 @@
     <Compile Include="Util\Camera.cs" />
     <Compile Include="Util\Entity.cs" />
     <Compile Include="Util\GameObject.cs" />
-    <Compile Include="Util\IDisposable.cs" />
-    <Compile Include="Util\Input.cs" />
     <Compile Include="Util\IRenderable.cs" />
     <Compile Include="Util\LightSource.cs" />
     <Compile Include="Util\Scene.cs" />

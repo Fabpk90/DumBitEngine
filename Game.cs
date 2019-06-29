@@ -14,22 +14,16 @@ namespace DumBitEngine
 {
     public class Game : GameWindow
     {
-        private Model model;
-        private Cube cube;
 
         public static Scene scene;
         public static LightSource light;
 
-        public static Camera mainCamera;
         public static Vector2 mousePosition;
-
-        private Camera camera;
+        
         private ImGuiRenderer imguiRenderer;
         private ImGuiInput imguiInput;
 
         public static bool isCursorVisible;
-
-        private string testingInput;
 
         private int testingInt = 0;
        /* TODO add a menu of some sort
@@ -55,34 +49,42 @@ namespace DumBitEngine
 
         protected override void OnLoad(EventArgs e)
         {
-            AudioMaster.Init();
             GL.Enable(EnableCap.DepthTest);
 
             isCursorVisible = CursorVisible = false;
             VSync = VSyncMode.On;
 
-            camera = new Camera(Width / Height);
-            mainCamera = camera;
+            Camera.main = new Camera(Width / Height);
+
+            AudioMaster.Init();
 
             imguiRenderer = new ImGuiRenderer("Assets/Shaders/imgui.glsl", Width, Height);
             
-            light = new LightSource();
-            model = new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj");
-            cube = new Cube("Assets/container.jpg");
+            light = new LightSource("Light"); // TODO: remove this and find a solution for shader using it
 
-            scene = new Scene();
-            scene.AddEntity(model);
-            scene.AddEntity(cube);
+            scene = new Scene("Scene");
             
-            scene.AddEntity(light);
+            GameObject cubeGO = new GameObject("Cube");
+            cubeGO.AddComponent(new Cube("Assets/container.jpg"));
+            
+            var modelGO = new GameObject("Model");
+            modelGO.AddComponent(new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj"));
+            modelGO.AddComponent(new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj"));
+            
+            var lightGO = new GameObject("Light");
+            lightGO.AddComponent(new LightSource("Light"));
 
-            testingInput = "";
+            scene.Add(modelGO);
+            scene.Add(cubeGO);
+            
+            scene.Add(lightGO);
+            
             imguiInput = new ImGuiInput();
             
-            Input.Init();
-            MouseDown += (sender, args) => Input.MouseEvent(args);
-            MouseUp += (sender, args) => Input.MouseEvent(args);
-            MouseMove += (sender, args) => Input.MouseEvent(args);
+            MasterInput.Init();
+            MouseDown += (sender, args) => MasterInput.MouseEvent(args);
+            MouseUp += (sender, args) => MasterInput.MouseEvent(args);
+            MouseMove += (sender, args) => MasterInput.MouseEvent(args);
             
             base.OnLoad(e);
         }
@@ -98,7 +100,7 @@ namespace DumBitEngine
             if (e.Button == MouseButton.Right)
             {
                 isCursorVisible = CursorVisible = !CursorVisible;
-                camera.SetMousePosition(new OpenTK.Vector2(Mouse.GetState().X, Mouse.GetState().Y));
+                Camera.main.SetMousePosition(new OpenTK.Vector2(Mouse.GetState().X, Mouse.GetState().Y));
             }
 
             base.OnMouseDown(e);
@@ -119,7 +121,7 @@ namespace DumBitEngine
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)
         {
-            camera.UpdateFOV(e.DeltaPrecise);
+            Camera.main.UpdateFOV(e.DeltaPrecise);
             
             base.OnMouseWheel(e);
         }
@@ -133,7 +135,8 @@ namespace DumBitEngine
 
             Time.deltaTime = (float) e.Time;
             //inputState.Update(Keyboard.GetState());
-            Input.Update();
+            MasterInput.Update();
+            AudioMaster.Update();
 
             HandleInput();
 
@@ -157,12 +160,7 @@ namespace DumBitEngine
                 Console.WriteLine("YEESS");
             }
 
-            if (ImGui.InputText("Test", ref testingInput, 10))
-            {
-                Console.WriteLine("Buffer has " + testingInput);
-            }
 
-            
             //ImGui.DragInt4()
             
             ImGui.End();
@@ -181,22 +179,14 @@ namespace DumBitEngine
         private void HandleInput()
         {
 
-            if (Input.IsKeyPressed(Key.Escape))
+            if (MasterInput.IsKeyPressed(Key.Escape))
                 Exit();
-            if (isCursorVisible)
+            if (!isCursorVisible)
             {
-            }
-            else
-            {
-                mainCamera.InputUpdate();
-
-                if (Input.IsKeyPressed(Key.E))
-                    scene.AddEntity(new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj"));
-                if (Input.IsKeyPressed(Key.R))
-                    scene.Dispose();
+                Camera.main.InputUpdate();
             }
 
-            camera.Draw();
+            Camera.main.Draw();
         }
 
         protected override void OnClosed(EventArgs e)

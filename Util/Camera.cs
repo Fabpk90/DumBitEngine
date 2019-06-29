@@ -10,6 +10,9 @@ namespace DumBitEngine.Core.Util
 {
     public class Camera : IRenderable
     {
+        public static Camera main;
+        
+        
         public Matrix4 view;
         public Matrix4 projection;
 
@@ -115,29 +118,29 @@ namespace DumBitEngine.Core.Util
 
         public void InputUpdate()
         {
-            if (Input.IsKeyPressed(Key.Up))
+            if (MasterInput.IsKeyPressed(Key.Up))
             {
                 cameraPos += CameraFront * movementSpeed * Time.deltaTime;
             }
-            else if (Input.IsKeyPressed(Key.Down))
+            else if (MasterInput.IsKeyPressed(Key.Down))
             {
                 cameraPos -= CameraFront * movementSpeed * Time.deltaTime;
             }
 
-            if (Input.IsKeyPressed(Key.Left))
+            if (MasterInput.IsKeyPressed(Key.Left))
             {
                 cameraPos -= Vector3.Normalize(Vector3.Cross(cameraFront, cameraUp)) * movementSpeed * Time.deltaTime;
             }
-            else if (Input.IsKeyPressed(Key.Right))
+            else if (MasterInput.IsKeyPressed(Key.Right))
             {
                 cameraPos += Vector3.Normalize(Vector3.Cross(cameraFront, cameraUp)) * movementSpeed * Time.deltaTime;
             }
             
-            if (Input.IsKeyPressed(Key.Space))
+            if (MasterInput.IsKeyPressed(Key.Space))
             {
                 cameraPos += cameraUp * movementSpeed * Time.deltaTime;
             }
-            else if (Input.IsKeyPressed(Key.ShiftLeft))
+            else if (MasterInput.IsKeyPressed(Key.ShiftLeft))
             {
                 cameraPos -= cameraUp * movementSpeed * Time.deltaTime;
             }

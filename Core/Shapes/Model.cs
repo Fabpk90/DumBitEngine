@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using Assimp;
 using Assimp.Unmanaged;
 using DumBitEngine.Core.Util;
+using Matrix4x4 = System.Numerics.Matrix4x4;
 using OpenTK;
+using Camera = DumBitEngine.Core.Util.Camera;
 using Scene = Assimp.Scene;
 
 namespace DumBitEngine.Core.Shapes
@@ -18,7 +20,7 @@ namespace DumBitEngine.Core.Shapes
         private string meshName;
         private string path;
 
-        public Model(string path, string meshName)
+        public Model(string path, string meshName) : base("mesh")
         {
             var asset = AssetLoader.UseElement(path + meshName);
             
@@ -26,7 +28,7 @@ namespace DumBitEngine.Core.Shapes
             {
                 Model model = asset as Model;
 
-                Console.WriteLine("Loading from table");
+                Console.WriteLine("Loading model from table");
 
                 if (model != null)
                 {
@@ -36,7 +38,7 @@ namespace DumBitEngine.Core.Shapes
                     this.meshName = meshName;
                     this.path = path;
                     
-                    transform = model.transform;
+                    transform = Matrix4x4.Identity;
                 }
             }
             else
@@ -48,13 +50,13 @@ namespace DumBitEngine.Core.Shapes
                 shader = new Shader("Assets/Shaders/mesh.glsl");
                 shader.Use();
 
-                transform = Matrix4.Identity;
-                transform *= Matrix4.CreateTranslation(0, -1.75f, 0);
-                transform *= Matrix4.CreateScale(.2f, .2f, .2f);
+                transform = Matrix4x4.Identity;
+                transform *= Matrix4x4.CreateTranslation(0, -1.75f, 0);
+                transform *= Matrix4x4.CreateScale(.2f, .2f, .2f);
 
                 shader.SetMatrix4("model", ref transform);
-                shader.SetMatrix4("view", ref Game.mainCamera.view);
-                shader.SetMatrix4("projection", ref Game.mainCamera.projection);
+                shader.SetMatrix4("view", ref Camera.main.view);
+                shader.SetMatrix4("projection", ref Camera.main.projection);
                 
                 shader.SetVector3("lightColor", ref Game.light.color);
                 shader.SetVector3("light.lightPos",  Game.light.transform.ExtractTranslation());
@@ -191,14 +193,22 @@ namespace DumBitEngine.Core.Shapes
         {
             shader.Use();
             
-            transform *= Matrix4.CreateRotationY(Time.deltaTime);
+            
+
+            //Console.WriteLine(transform);
+            
+            transform *= parent.transform * Matrix4x4.CreateRotationY(Time.deltaTime);
+            
+            
+           
             
             shader.SetMatrix4("model", ref transform);
-            shader.SetMatrix4("view", ref Game.mainCamera.view);
-            shader.SetVector3("viewPos", Game.mainCamera.view.ExtractTranslation());
+            shader.SetMatrix4("view", ref Camera.main.view);
+            shader.SetVector3("viewPos", Camera.main.view.ExtractTranslation());
             shader.SetVector3("light.lightColor", ref Game.light.color);
-            shader.SetMatrix4("projection", ref Game.mainCamera.projection);
+            shader.SetMatrix4("projection", ref Camera.main.projection);
             shader.SetVector3("light.lightPos",  Game.light.transform.ExtractTranslation());
+            shader.SetFloat("material.shininess", 32);
             
             foreach (var mesh in meshes)
             {

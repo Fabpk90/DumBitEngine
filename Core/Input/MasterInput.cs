@@ -7,7 +7,7 @@ using Vector2 = System.Numerics.Vector2;
 
 namespace DumBitEngine.Core.Util
 {
-    public static class Input
+    public static class MasterInput
     {
         private static bool[] keyPressed;
         private static bool[] keyPressedLastFrame;

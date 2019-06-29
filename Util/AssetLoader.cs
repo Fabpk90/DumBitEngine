@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 
 namespace DumBitEngine.Core.Util
@@ -69,7 +70,7 @@ namespace DumBitEngine.Core.Util
         {
             if (!hashTable.ContainsKey(key))
             {
-                Asset ass;
+                Asset ass; //not a typo
                 
                 ass.users = 1;
                 ass.assetRef = element;

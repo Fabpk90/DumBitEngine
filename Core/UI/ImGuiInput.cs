@@ -20,10 +20,10 @@ namespace DumBitEngine.Core.Util
 
             if (Game.isCursorVisible)
             {
-                io.MousePos = Input.MousePosition;
-                io.MouseDown[0] = Input.IsLeftMouseButtonDown;
+                io.MousePos = MasterInput.MousePosition;
+                io.MouseDown[0] = MasterInput.IsLeftMouseButtonDown;
 
-                if (Input.GetKeyPressed(out Key keyPressed))
+                if (MasterInput.GetKeyPressed(out Key keyPressed))
                 {
                     if (keyPressed == Key.BackSpace)
                     {

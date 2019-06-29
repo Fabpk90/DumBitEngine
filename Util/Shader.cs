@@ -142,5 +142,10 @@ namespace DumBitEngine.Core.Util
                 Console.WriteLine("Unloading shader at: " + path);
             }       
         }
+
+        public void SetFloat(string name, float f)
+        {
+           GL.Uniform1(GL.GetUniformLocation(ProgramId, name), f);
+        }
     }
 }

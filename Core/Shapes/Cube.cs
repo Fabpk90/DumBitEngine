@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Numerics;
 using DumBitEngine.Core.Util;
 using OpenTK;
 using OpenTK.Graphics;
@@ -21,7 +22,7 @@ namespace DumBitEngine.Core.Shapes
         private float[] vertex;
         private uint[] index;
 
-        public Cube(string texturePath)
+        public Cube(string texturePath) : base("Cube")
         {
             index = new uint[]
             {
@@ -53,7 +54,9 @@ namespace DumBitEngine.Core.Shapes
                 -0.5f, 0.5f, -0.5f,   .5f, .55f, .69f, 0.0f, 1.0f
             };
             
-            transform = Matrix4.Identity;
+            transform = Matrix4x4.Identity;
+
+            name = "Cube";
 
             vao = GL.GenVertexArray();
             GL.BindVertexArray(vao);
@@ -79,7 +82,7 @@ namespace DumBitEngine.Core.Shapes
             shaderProgram = new Shader("Assets/Shaders/cube.glsl");
             shaderProgram.Use();
             
-            shaderProgram.SetMatrix4("projection", ref Game.mainCamera.projection);
+            shaderProgram.SetMatrix4("projection", ref Camera.main.projection);
             
            texture0 = new Texture(texturePath, "");
 
@@ -88,12 +91,12 @@ namespace DumBitEngine.Core.Shapes
 
         public override void Awake()
         {
-            throw new NotImplementedException();
+           
         }
 
         public override void Start()
         {
-            throw new NotImplementedException();
+           
         }
 
         public override void Dispose()
@@ -110,8 +113,8 @@ namespace DumBitEngine.Core.Shapes
 
         public override void Draw()
         {
-            transform *= Matrix4.CreateRotationY(Time.deltaTime);
-            transform *= Matrix4.CreateRotationX(Time.deltaTime);
+            transform *= Matrix4x4.CreateRotationY(Time.deltaTime);
+            transform *= Matrix4x4.CreateRotationX(Time.deltaTime);
 
             
             GL.BindVertexArray(vao);
@@ -119,8 +122,8 @@ namespace DumBitEngine.Core.Shapes
 
             shaderProgram.Use();
             shaderProgram.SetMatrix4("transform", ref transform);
-            shaderProgram.SetMatrix4("view", ref Game.mainCamera.view);
-            shaderProgram.SetMatrix4("projection", ref Game.mainCamera.projection);
+            shaderProgram.SetMatrix4("view", ref Camera.main.view);
+            shaderProgram.SetMatrix4("projection", ref Camera.main.projection);
             
             shaderProgram.SetVector3("lightColor", ref Game.light.color);
             
