@@ -126,6 +126,7 @@
     <Compile Include="Util\Vertex.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include=".gitignore" />
     <Content Include="Assets\Shaders\imgui.glsl" />
     <Content Include="Assets\Shaders\lightSource.glsl" />
     <Content Include="OpenTK.dll.config">
