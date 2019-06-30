@@ -129,6 +129,7 @@
     <Content Include=".gitignore" />
     <Content Include="Assets\Shaders\imgui.glsl" />
     <Content Include="Assets\Shaders\lightSource.glsl" />
+    <Content Include="Assets\Sound\bounce.wav" />
     <Content Include="OpenTK.dll.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
