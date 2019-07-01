@@ -16,8 +16,13 @@ namespace DumBitEngine.Core.Util
         {
             isActive = true;
             this.name = name;
+
+            transform = Matrix4x4.Identity;
         }
-        
+
+        public abstract void GetUiToDraw();
+
+
         public abstract void Awake();
         public abstract void Start();
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using ImGuiNET;
 using OpenTK;
 
 namespace DumBitEngine.Core.Util
@@ -9,12 +10,19 @@ namespace DumBitEngine.Core.Util
     public class GameObject : Entity
     {
         private List<Entity> attachedComponent;
-        public Matrix4x4 transform;
 
         public GameObject(string name) : base(name)
         {
             attachedComponent = new List<Entity>();
             transform = Matrix4x4.Identity;
+        }
+
+        public override void GetUiToDraw()
+        {
+            foreach (var item in attachedComponent)
+            {
+                item.GetUiToDraw();
+            }
         }
 
         public void AddComponent(Entity ent)

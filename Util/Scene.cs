@@ -66,9 +66,7 @@ namespace DumBitEngine.Core.Util
 
             if (selectedObject != null)
             {
-                var vec = selectedObject.GetComponent<Entity>().transform.Translation;
-                ImGui.DragFloat3("Position", ref vec);
-                selectedObject.GetComponent<Entity>().transform.Translation = vec;
+                selectedObject.GetUiToDraw();
             }
         }
 
@@ -80,6 +78,11 @@ namespace DumBitEngine.Core.Util
             }
             
             DrawTreeUI();
+        }
+
+        public override void GetUiToDraw()
+        {
+            
         }
     }
 }

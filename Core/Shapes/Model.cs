@@ -8,6 +8,7 @@ using Matrix4x4 = System.Numerics.Matrix4x4;
 using OpenTK;
 using Camera = DumBitEngine.Core.Util.Camera;
 using Scene = Assimp.Scene;
+using ImGuiNET;
 
 namespace DumBitEngine.Core.Shapes
 {
@@ -212,6 +213,15 @@ namespace DumBitEngine.Core.Shapes
             {
                 mesh.Draw(ref shader);
             }
+        }
+
+        public override void GetUiToDraw()
+        {
+            ImGui.Text(name);
+
+            var position = transform.Translation;
+            ImGui.DragFloat3("Position", ref position);
+            transform.Translation = position;
         }
     }
 }

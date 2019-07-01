@@ -117,6 +117,7 @@ namespace DumBitEngine
         protected override void OnResize(EventArgs e)
         {
             GL.Viewport(0, 0, Width, Height);
+            imguiRenderer.ResizeScreen(Width, Height);
             base.OnResize(e);
         }
 

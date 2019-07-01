@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Numerics;
 using DumBitEngine.Core.Sound;
 using DumBitEngine.Core.Util;
+using ImGuiNET;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -133,6 +134,15 @@ namespace DumBitEngine.Core.Shapes
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D ,texture0.id);
             GL.DrawElements(PrimitiveType.Triangles, index.Length, DrawElementsType.UnsignedInt, 0);
+        }
+
+        public override void GetUiToDraw()
+        {
+            ImGui.Text(name);
+
+            var position = transform.Translation;
+            ImGui.DragFloat3("Position", ref position);
+            transform.Translation = position;
         }
     }
 }

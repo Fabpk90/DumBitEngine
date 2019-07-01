@@ -115,6 +115,12 @@ namespace DumBitEngine.Core.Util
             shader.SetInt("FontTexture", 0);
         }
 
+        public void ResizeScreen(int width, int height)
+        {
+            io.DisplaySize.X = width;
+            io.DisplaySize.Y = height;
+        }
+
         public void DrawData()
         {
             if(ImGui.GetDrawData().TotalVtxCount  == 0)
@@ -126,8 +132,6 @@ namespace DumBitEngine.Core.Util
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             GL.Disable(EnableCap.CullFace);
             GL.Disable(EnableCap.DepthTest);
-            
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
 
             shader.Use();
 

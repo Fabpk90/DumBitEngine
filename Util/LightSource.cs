@@ -1,7 +1,7 @@
 using System;
 using System.Numerics;
+using ImGuiNET;
 using OpenTK.Graphics.OpenGL4;
-using Vector3 = OpenTK.Vector3;
 
 namespace DumBitEngine.Core.Util
 {
@@ -80,9 +80,10 @@ namespace DumBitEngine.Core.Util
         public override void Draw()
         {
             GL.BindVertexArray(vao);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+
             shader.Use();
             shader.SetMatrix4("view", ref Camera.main.view);
+            shader.SetMatrix4("transform", ref transform);
             shader.SetMatrix4("projection", ref Camera.main.projection);
             
             
@@ -106,6 +107,17 @@ namespace DumBitEngine.Core.Util
             GL.DeleteBuffer(vao);
             GL.DeleteBuffer(vbo);
             GL.DeleteBuffer(ebo);
+        }
+
+        public override void GetUiToDraw()
+        {
+            ImGui.Text(name);
+
+            var position = transform.Translation;
+            ImGui.DragFloat3("Position", ref position);
+            transform.Translation = position;
+
+            ImGui.ColorPicker3("Color", ref color);
         }
     }
 }
