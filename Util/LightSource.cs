@@ -1,12 +1,12 @@
 using System;
-using OpenTK;
+using System.Numerics;
 using OpenTK.Graphics.OpenGL4;
+using Vector3 = OpenTK.Vector3;
 
 namespace DumBitEngine.Core.Util
 {
     public class LightSource : Entity
     {
-        public Matrix4 transform;
         public Vector3 color;
         
         private uint[] index;
@@ -50,8 +50,8 @@ namespace DumBitEngine.Core.Util
                 -0.5f, 0.5f, -0.5f,   
             };
             
-            transform = Matrix4.Identity;
-            transform *= Matrix4.CreateTranslation(1, 1, 1);
+            transform = Matrix4x4.Identity;
+            transform *= Matrix4x4.CreateTranslation(1, 1, 1);
             color = new Vector3(.25f, .5f, .5f);
             
             shader = new Shader("Assets/Shaders/lightSource.glsl");

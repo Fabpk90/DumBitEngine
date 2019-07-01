@@ -59,7 +59,7 @@ namespace DumBitEngine.Core.Shapes
                 shader.SetMatrix4("projection", ref Camera.main.projection);
                 
                 shader.SetVector3("lightColor", ref Game.light.color);
-                shader.SetVector3("light.lightPos",  Game.light.transform.ExtractTranslation());
+                shader.SetVector3("light.lightPos",  Game.light.transform.Translation);
 
                 meshes = new List<Mesh>();
 
@@ -202,7 +202,10 @@ namespace DumBitEngine.Core.Shapes
             shader.SetVector3("viewPos", Camera.main.view.ExtractTranslation());
             shader.SetVector3("light.lightColor", ref Game.light.color);
             shader.SetMatrix4("projection", ref Camera.main.projection);
-            shader.SetVector3("light.lightPos",  Game.light.transform.ExtractTranslation());
+            shader.SetVector3("light.lightPos",  Game.light.transform.Translation);
+
+            //Console.WriteLine(Game.light.transform.ExtractTranslation());
+            
             shader.SetFloat("material.shininess", 32);
             
             foreach (var mesh in meshes)

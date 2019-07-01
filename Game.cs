@@ -74,12 +74,18 @@ namespace DumBitEngine
             cube.transform *= Matrix4x4.CreateTranslation(0, -1f, 0);
             cubeGO.AddComponent(cube);
             
+            var cube0 = new Cube("Assets/container.jpg");
+            cube0.transform *= Matrix4x4.CreateTranslation(-1, 0, 0);
+            cube0.isRotating = true;
+            cubeGO.AddComponent(cube0);
+
+            
             var modelGO = new GameObject("Model");
             modelGO.AddComponent(new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj"));
             modelGO.AddComponent(new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj"));
             
             var lightGO = new GameObject("Light");
-            lightGO.AddComponent(new LightSource("Light"));
+            lightGO.AddComponent(light);
 
             scene.Add(modelGO);
             scene.Add(cubeGO);

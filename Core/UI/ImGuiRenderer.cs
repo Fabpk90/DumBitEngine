@@ -128,8 +128,6 @@ namespace DumBitEngine.Core.Util
             GL.Disable(EnableCap.DepthTest);
             
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
-            
-            GL.BindVertexArray(vao);
 
             shader.Use();
 
@@ -193,12 +191,15 @@ namespace DumBitEngine.Core.Util
 
         private void UpdateBuffers(ImDrawDataPtr data)
         {
+            GL.BindVertexArray(vao);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);	
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
+            
             int totalVBSize = (data.TotalVtxCount * Marshal.SizeOf<ImDrawVert>());
             if (totalVBSize > sizeVertex)
             {
                 sizeVertex = (int) (totalVBSize * 1.5f);
 
-                GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
                 GL.BufferData(BufferTarget.ArrayBuffer, sizeVertex, IntPtr.Zero, BufferUsageHint.DynamicDraw);
             }
             
@@ -206,8 +207,7 @@ namespace DumBitEngine.Core.Util
             if (totalIBSize > sizeIndex)
             {
                 sizeIndex = (int) (totalIBSize * 1.5f);
-                
-                GL.BindBuffer(BufferTarget.ElementArrayBuffer ,indexBuffer);
+
                 GL.BufferData(BufferTarget.ElementArrayBuffer, sizeIndex, IntPtr.Zero, BufferUsageHint.DynamicDraw);
             }
 

@@ -66,9 +66,12 @@ namespace DumBitEngine.Core.Util
 
             if (selectedObject != null)
             {
-                var vec = selectedObject.GetComponent<Model>().transform.Translation;
+                var vec = selectedObject.GetComponent<Entity>().transform.Translation;
                 ImGui.DragFloat3("Position", ref vec);
-                selectedObject.GetComponent<Model>().transform.Translation = vec;
+                selectedObject.GetComponent<Entity>().transform.Translation = vec;
+
+                Console.WriteLine("Translation after " + selectedObject.GetComponent<Entity>().transform.Translation);
+                Console.WriteLine("Translation light after " + Game.light.transform.Translation);
             }
         }
 
