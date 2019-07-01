@@ -82,7 +82,17 @@ namespace DumBitEngine
             
             var modelGO = new GameObject("Model");
             modelGO.AddComponent(new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj"));
-            modelGO.AddComponent(new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj"));
+            modelGO.GetComponent<Model>().transform *= Matrix4x4.CreateTranslation(0, -1.75f, 0);
+            modelGO.GetComponent<Model>().transform *= Matrix4x4.CreateScale(.2f, .2f, .2f);
+            modelGO.GetComponent<Model>().isRotating = true;
+
+
+            var sofa = new Model("Assets/Mesh/Sofa/", "Sofa.obj");
+            sofa.transform *= Matrix4x4.CreateRotationY(MathHelper.DegreesToRadians(45f));
+            sofa.transform *= Matrix4x4.CreateScale(.1f, .1f, .1f);
+            sofa.transform *= Matrix4x4.CreateTranslation(0, 0, -9f);
+
+            modelGO.AddComponent(sofa);
             
             var lightGO = new GameObject("Light");
             lightGO.AddComponent(light);

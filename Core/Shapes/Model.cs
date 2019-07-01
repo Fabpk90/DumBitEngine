@@ -20,6 +20,8 @@ namespace DumBitEngine.Core.Shapes
         private string meshName;
         private string path;
 
+        public bool isRotating;
+
         public Model(string path, string meshName) : base("mesh")
         {
             var asset = AssetLoader.UseElement(path + meshName);
@@ -51,8 +53,6 @@ namespace DumBitEngine.Core.Shapes
                 shader.Use();
 
                 transform = Matrix4x4.Identity;
-                transform *= Matrix4x4.CreateTranslation(0, -1.75f, 0);
-                transform *= Matrix4x4.CreateScale(.2f, .2f, .2f);
 
                 shader.SetMatrix4("model", ref transform);
                 shader.SetMatrix4("view", ref Camera.main.view);
@@ -194,8 +194,8 @@ namespace DumBitEngine.Core.Shapes
             shader.Use();
             
             //Console.WriteLine(transform);
-            
-            transform *= parent.transform * Matrix4x4.CreateRotationY(Time.deltaTime);
+            if(isRotating)
+                transform *= parent.transform * Matrix4x4.CreateRotationY(Time.deltaTime);
             
             shader.SetMatrix4("model", ref transform);
             shader.SetMatrix4("view", ref Camera.main.view);
