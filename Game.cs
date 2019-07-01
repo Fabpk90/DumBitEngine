@@ -6,6 +6,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using System;
 using System.Drawing;
+using System.Numerics;
 using DumBitEngine.Core.Sound;
 using ImGuiNET;
 using Vector2 = System.Numerics.Vector2;
@@ -26,6 +27,9 @@ namespace DumBitEngine
         public static bool isCursorVisible;
 
         private int testingInt = 0;
+
+        private Source presentationSource;
+        
        /* TODO add a menu of some sort
             optimize the handling of vertices (store only the vertices and different transform for each)
         */
@@ -60,12 +64,15 @@ namespace DumBitEngine
 
             imguiRenderer = new ImGuiRenderer("Assets/Shaders/imgui.glsl", Width, Height);
             
-            light = new LightSource("Light"); // TODO: remove this and find a solution for shader using it
+            light = new LightSource("Light"); // TODO: remove this(static) and find a solution for shader using it
 
             scene = new Scene("Scene");
             
             GameObject cubeGO = new GameObject("Cube");
-            cubeGO.AddComponent(new Cube("Assets/container.jpg"));
+            var cube = new Cube("Assets/container.jpg");
+            cube.transform = Matrix4x4.CreateScale(10, 0.1f, 10);
+            cube.transform *= Matrix4x4.CreateTranslation(0, -1f, 0);
+            cubeGO.AddComponent(cube);
             
             var modelGO = new GameObject("Model");
             modelGO.AddComponent(new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj"));
@@ -85,6 +92,8 @@ namespace DumBitEngine
             MouseDown += (sender, args) => MasterInput.MouseEvent(args);
             MouseUp += (sender, args) => MasterInput.MouseEvent(args);
             MouseMove += (sender, args) => MasterInput.MouseEvent(args);
+
+            presentationSource = AudioMaster.LoadSourceAndSound("Assets/Sound/bounce.wav");
             
             base.OnLoad(e);
         }
@@ -184,6 +193,11 @@ namespace DumBitEngine
             if (!isCursorVisible)
             {
                 Camera.main.InputUpdate();
+
+                if (MasterInput.IsKeyDown(Key.Space))
+                {
+                    presentationSource.Play();
+                }
             }
 
             Camera.main.Draw();

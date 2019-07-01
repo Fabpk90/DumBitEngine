@@ -22,7 +22,7 @@ namespace DumBitEngine.Core.Shapes
         
         private float[] vertex;
         private uint[] index;
-        private Source source;
+        public bool isRotating;
 
         public Cube(string texturePath) : base("Cube")
         {
@@ -89,13 +89,6 @@ namespace DumBitEngine.Core.Shapes
            texture0 = new Texture(texturePath, "");
 
            shaderProgram.SetInt("tex0", 0);
-           
-           
-           source = AudioMaster.LoadSourceAndSound("Assets/Sound/bounce.wav");
-           source.SetPosition(transform.Translation);
-           source.Volume = .15f;
-           source.Play();
-           
         }
 
         public override void Awake()
@@ -122,10 +115,12 @@ namespace DumBitEngine.Core.Shapes
 
         public override void Draw()
         {
-            transform *= Matrix4x4.CreateRotationY(Time.deltaTime);
-            transform *= Matrix4x4.CreateRotationX(Time.deltaTime);
+            if (isRotating)
+            {
+                transform *= Matrix4x4.CreateRotationY(Time.deltaTime);
+                transform *= Matrix4x4.CreateRotationX(Time.deltaTime);
+            }
 
-            
             GL.BindVertexArray(vao);
 
             shaderProgram.Use();

@@ -53,7 +53,6 @@ namespace DumBitEngine.Core.Sound
 
         public void Play()
         {
-            AL.Source(sourceID, ALSourceb.Looping, true);
             AL.SourcePlay(sourceID);
 
             isPlaying = true;
