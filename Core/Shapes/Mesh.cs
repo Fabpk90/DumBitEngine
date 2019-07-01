@@ -63,7 +63,6 @@ namespace DumBitEngine.Core.Shapes
         public void Draw(ref Shader shader)
         {
             GL.BindVertexArray(vao);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
 
             // bind appropriate textures
             uint diffuseNr  = 1;

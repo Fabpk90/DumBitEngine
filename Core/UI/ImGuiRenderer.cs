@@ -130,8 +130,6 @@ namespace DumBitEngine.Core.Util
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
             
             GL.BindVertexArray(vao);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
 
             shader.Use();
 

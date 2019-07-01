@@ -147,5 +147,15 @@ namespace DumBitEngine.Core.Util
         {
            GL.Uniform1(GL.GetUniformLocation(ProgramId, name), f);
         }
+
+        public void SetVector3(string name, ref System.Numerics.Vector3 vector)
+        {
+            GL.Uniform3(GL.GetUniformLocation(ProgramId, name), vector.X, vector.Y, vector.Z);
+        }
+        
+        public void SetVector3(string name, System.Numerics.Vector3 vector)
+        {
+            GL.Uniform3(GL.GetUniformLocation(ProgramId, name), vector.X, vector.Y, vector.Z);
+        }
     }
 }

@@ -193,14 +193,9 @@ namespace DumBitEngine.Core.Shapes
         {
             shader.Use();
             
-            
-
             //Console.WriteLine(transform);
             
             transform *= parent.transform * Matrix4x4.CreateRotationY(Time.deltaTime);
-            
-            
-           
             
             shader.SetMatrix4("model", ref transform);
             shader.SetMatrix4("view", ref Camera.main.view);

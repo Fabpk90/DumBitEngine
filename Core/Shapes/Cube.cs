@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Numerics;
+using DumBitEngine.Core.Sound;
 using DumBitEngine.Core.Util;
 using OpenTK;
 using OpenTK.Graphics;
@@ -21,6 +22,7 @@ namespace DumBitEngine.Core.Shapes
         
         private float[] vertex;
         private uint[] index;
+        private Source source;
 
         public Cube(string texturePath) : base("Cube")
         {
@@ -87,6 +89,13 @@ namespace DumBitEngine.Core.Shapes
            texture0 = new Texture(texturePath, "");
 
            shaderProgram.SetInt("tex0", 0);
+           
+           
+           source = AudioMaster.LoadSourceAndSound("Assets/Sound/bounce.wav");
+           source.SetPosition(transform.Translation);
+           source.Volume = .15f;
+           source.Play();
+           
         }
 
         public override void Awake()
@@ -118,7 +127,6 @@ namespace DumBitEngine.Core.Shapes
 
             
             GL.BindVertexArray(vao);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
 
             shaderProgram.Use();
             shaderProgram.SetMatrix4("transform", ref transform);
