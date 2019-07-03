@@ -19,9 +19,19 @@ namespace DumBitEngine.Core.Util
 
         public override void GetUiToDraw()
         {
+            Entity entityToRemove = null;
             foreach (var item in attachedComponent)
             {
                 item.GetUiToDraw();
+                if (ImGui.Button("Delete"))
+                {
+                    entityToRemove = item;
+                }
+            }
+
+            if(entityToRemove != null)
+            {
+                attachedComponent.Remove(entityToRemove);
             }
         }
 

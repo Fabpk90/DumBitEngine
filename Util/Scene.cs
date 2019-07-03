@@ -51,7 +51,6 @@ namespace DumBitEngine.Core.Util
 
         private void DrawTreeUI()
         {
-            ImGui.Text("Yess");
             if (ImGui.TreeNode("Objects of the scene"))
             {
                 foreach (GameObject entity in sceneGraph)
@@ -62,6 +61,13 @@ namespace DumBitEngine.Core.Util
                     }
                         
                 }
+            }
+
+
+            if (ImGui.Button("Add GO"))
+            {
+                GameObject go = new GameObject("GameObject");
+                sceneGraph.Add(go);
             }
 
             if (selectedObject != null)

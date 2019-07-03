@@ -9,6 +9,7 @@ using OpenTK;
 using Camera = DumBitEngine.Core.Util.Camera;
 using Scene = Assimp.Scene;
 using ImGuiNET;
+using System.Windows.Forms;
 
 namespace DumBitEngine.Core.Shapes
 {
@@ -222,6 +223,29 @@ namespace DumBitEngine.Core.Shapes
             var position = transform.Translation;
             ImGui.DragFloat3("Position", ref position);
             transform.Translation = position;
+
+            if(ImGui.Button("Load Another Model"))
+            {
+                //TODO: make this crossplatform
+                OpenFileDialog fileDialog = new OpenFileDialog();
+                fileDialog.ShowDialog();
+
+                Console.WriteLine(fileDialog.FileName);
+                Console.WriteLine(fileDialog.SafeFileName);
+
+                string newPath = fileDialog.FileName.Replace('\\', '/');
+                newPath = newPath.Remove(newPath.Length - fileDialog.SafeFileName.Length);
+                Console.WriteLine(newPath);
+
+                Model m = new Model(newPath, fileDialog.SafeFileName);
+
+                AssetLoader.RemoveElement(path + meshName);
+
+                meshes.Clear();
+                meshes = m.meshes;
+                meshName = fileDialog.SafeFileName;
+                path = newPath;
+            }
         }
     }
 }
