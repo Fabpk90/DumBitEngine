@@ -1,5 +1,6 @@
 using System.Numerics;
 using DumBitEngine.Core.Util;
+using DumBitEngine.Util;
 using OpenTK;
 
 namespace DumBitEngine.Core.Shapes

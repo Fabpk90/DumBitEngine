@@ -1,8 +1,8 @@
 using System;
 using System.Numerics;
+using DumBitEngine.Core.Util;
 
-
-namespace DumBitEngine.Core.Util
+namespace DumBitEngine.Util
 {
     public abstract class Entity : IRenderable, IDisposable
     {

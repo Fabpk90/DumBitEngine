@@ -5,7 +5,7 @@ namespace DumBitEngine.Core.Util
 {
     public static class AssetLoader
     {
-        public struct Asset
+        private struct Asset
         {
             public IDisposable assetRef;
             public uint users;

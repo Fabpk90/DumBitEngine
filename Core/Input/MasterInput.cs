@@ -72,11 +72,21 @@ namespace DumBitEngine.Core.Util
             }
         }
 
+        /// <summary>
+        /// Checks if the key was pressed
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public static bool IsKeyPressed(Key key)
         {
             return keyPressed[(int) key];
         }
 
+        /// <summary>
+        /// Checks if the key is down
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public static bool IsKeyDown(Key key)
         {
             return keyDown[(int) key];

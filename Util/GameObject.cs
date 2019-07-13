@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using DumBitEngine.Util;
 using ImGuiNET;
 using OpenTK;
 
@@ -42,7 +43,7 @@ namespace DumBitEngine.Core.Util
 
             for (int i = 0; i < attachedComponent.Count && !found; i++)
             {
-                if (attachedComponent[i] == ent)
+                if (attachedComponent[i].GetType() == ent.GetType())
                 {
                     found = true;
                 }

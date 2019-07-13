@@ -19,8 +19,6 @@ namespace DumBitEngine
         public static Scene scene;
         public static LightSource light;
 
-        public static Vector2 mousePosition;
-        
         private ImGuiRenderer imguiRenderer;
         private ImGuiInput imguiInput;
 
@@ -45,12 +43,6 @@ namespace DumBitEngine
             GraphicsContextFlags.ForwardCompatible)
         { }
 
-        [STAThread]
-        static void Main(string[] args)
-        {
-            new Game().Run();
-        }
-
         protected override void OnLoad(EventArgs e)
         {
             GL.Enable(EnableCap.DepthTest);
@@ -73,27 +65,13 @@ namespace DumBitEngine
             cube.transform = Matrix4x4.CreateScale(10, 0.1f, 10);
             cube.transform *= Matrix4x4.CreateTranslation(0, -1f, 0);
             cubeGO.AddComponent(cube);
-            
-            var cube0 = new Cube("Assets/container.jpg");
-            cube0.transform *= Matrix4x4.CreateTranslation(-1, 0, 0);
-            cube0.isRotating = true;
-            cubeGO.AddComponent(cube0);
 
-            
             var modelGO = new GameObject("Model");
             modelGO.AddComponent(new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj"));
             modelGO.GetComponent<Model>().transform *= Matrix4x4.CreateTranslation(0, -1.75f, 0);
             modelGO.GetComponent<Model>().transform *= Matrix4x4.CreateScale(.2f, .2f, .2f);
             modelGO.GetComponent<Model>().isRotating = true;
 
-
-            var sofa = new Model("Assets/Mesh/Sofa/", "Sofa.obj");
-            sofa.transform *= Matrix4x4.CreateRotationY(MathHelper.DegreesToRadians(45f));
-            sofa.transform *= Matrix4x4.CreateScale(.1f, .1f, .1f);
-            sofa.transform *= Matrix4x4.CreateTranslation(0, 0, -9f);
-
-            modelGO.AddComponent(sofa);
-            
             var lightGO = new GameObject("Light");
             lightGO.AddComponent(light);
 
@@ -135,9 +113,6 @@ namespace DumBitEngine
 
         protected override void OnMouseMove(MouseMoveEventArgs e)
         {
-            mousePosition.X = e.Position.X;
-            mousePosition.Y = e.Position.Y;
-            
             if (Focused && !CursorVisible) // check to see if the window is focused  
             {
                 Mouse.SetPosition(X + Width/2f, Y + Height/2f);

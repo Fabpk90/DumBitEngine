@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DumBitEngine.Core.Shapes;
+using DumBitEngine.Util;
 using ImGuiNET;
 
 namespace DumBitEngine.Core.Util
@@ -73,7 +74,14 @@ namespace DumBitEngine.Core.Util
             if (selectedObject != null)
             {
                 selectedObject.GetUiToDraw();
+
+                if (ImGui.Button("Add Component"))
+                {
+                    
+                }
             }
+
+            
         }
 
         public override void Draw()

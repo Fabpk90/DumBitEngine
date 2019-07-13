@@ -44,10 +44,7 @@ namespace DumBitEngine.Core.Sound
             sources = new List<Source>();
 
             AL.Listener(ALListener3f.Position, Camera.main.cameraPos.X, Camera.main.cameraPos.Y, Camera.main.cameraPos.Z);
-            Console.WriteLine(Camera.main.cameraPos);
             AL.Listener(ALListener3f.Velocity, 0, 0, 0);
-
-            Console.WriteLine(AL.GetError());
         }
 
         public static Source LoadSourceAndSound(string path)
@@ -62,11 +59,35 @@ namespace DumBitEngine.Core.Sound
 
         public static SoundClip LoadSound(string path)
         {
-            SoundClip clip = LoadWave(path);
+            SoundClip clip;
+
+            string s = path.Substring(path.IndexOf('.'));
+
+            Console.WriteLine(s);
+
+            switch (s)
+            {
+                case ".wav":
+                    clip = LoadWave(path);
+                    break;
+                case ".ogg":
+                    clip = LoadOgg(path);
+                    break;
+                default:
+                    throw new Exception("SoundFormat not recognised");
+            }
 
             AL.BufferData(clip.buffer,GetSoundFormat(clip.format), clip.data, clip.data.Length, clip.format.sampleRate);
 
             return clip;
+        }
+
+        private static SoundClip LoadOgg(string path)
+        {
+            BinaryReader br = new BinaryReader(new FileStream(path, FileMode.Open));
+            
+            br.Close();
+            return null;
         }
 
         private static ALFormat GetSoundFormat(SoundFormat clipFormat)
@@ -101,7 +122,7 @@ namespace DumBitEngine.Core.Sound
             return ALFormat.Mono8;
         }
 
-        public static SoundClip LoadWave(string path)
+        private static SoundClip LoadWave(string path)
         {
             BinaryReader br = new BinaryReader(new FileStream(path, FileMode.Open));
             
