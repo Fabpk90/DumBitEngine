@@ -14,7 +14,7 @@ namespace DumBitEngine.Core.Util
         private List<GameObject> sceneGraph;
         private GameObject selectedObject;
 
-        public Scene(string name) : base(name)
+        public Scene(string name) : base(name, null)
         {
             sceneGraph = new List<GameObject>();
         }
@@ -67,7 +67,7 @@ namespace DumBitEngine.Core.Util
 
             if (ImGui.Button("Add GO"))
             {
-                GameObject go = new GameObject("GameObject");
+                GameObject go = new GameObject("GameObject", null);
                 sceneGraph.Add(go);
             }
 

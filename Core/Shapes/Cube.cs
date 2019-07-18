@@ -20,12 +20,10 @@ namespace DumBitEngine.Core.Shapes
 
         private Texture texture0;
         
-        
-        private float[] vertex;
-        private uint[] index;
+        private readonly uint[] index;
         public bool isRotating;
 
-        public Cube(string texturePath) : base("Cube")
+        public Cube(string texturePath, GameObject parent = null) : base("Cube", parent)
         {
             index = new uint[]
             {
@@ -44,7 +42,7 @@ namespace DumBitEngine.Core.Shapes
                 2, 1, 5
             };
 
-            vertex = new float[]
+            var vertex = new float[]
             {
                 //pos                   //color        //texcoord
                 0.5f, 0.5f, 0.5f,     .9f, .59f, .7f, 1.0f, 1.0f, // top right
@@ -56,8 +54,6 @@ namespace DumBitEngine.Core.Shapes
                 -0.5f, -0.5f, -0.5f,  .5f, .6f, .675f, 0.0f, 0.0f,
                 -0.5f, 0.5f, -0.5f,   .5f, .55f, .69f, 0.0f, 1.0f
             };
-            
-            transform = Matrix4x4.Identity;
 
             name = "Cube";
 
@@ -118,14 +114,14 @@ namespace DumBitEngine.Core.Shapes
         {
             if (isRotating)
             {
-                transform *= Matrix4x4.CreateRotationY(Time.deltaTime);
-                transform *= Matrix4x4.CreateRotationX(Time.deltaTime);
+                parent.transform *= Matrix4x4.CreateRotationY(Time.deltaTime);
+                parent.transform *= Matrix4x4.CreateRotationX(Time.deltaTime);
             }
 
             GL.BindVertexArray(vao);
 
             shaderProgram.Use();
-            shaderProgram.SetMatrix4("transform", ref transform);
+            shaderProgram.SetMatrix4("transform", ref parent.transform);
             shaderProgram.SetMatrix4("view", ref Camera.main.view);
             shaderProgram.SetMatrix4("projection", ref Camera.main.projection);
             
@@ -140,9 +136,9 @@ namespace DumBitEngine.Core.Shapes
         {
             ImGui.Text(name);
 
-            var position = transform.Translation;
+            var position = parent.transform.Translation;
             ImGui.DragFloat3("Position", ref position);
-            transform.Translation = position;
+            parent.transform.Translation = position;
         }
     }
 }

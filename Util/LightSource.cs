@@ -19,7 +19,7 @@ namespace DumBitEngine.Core.Util
         private int vbo;
         private int ebo;
 
-        public LightSource(string name) : base(name)
+        public LightSource(string name, GameObject parent) : base(name, parent)
         {
             index = new uint[]
             {
@@ -51,8 +51,6 @@ namespace DumBitEngine.Core.Util
                 -0.5f, 0.5f, -0.5f,   
             };
             
-            transform = Matrix4x4.Identity;
-            transform *= Matrix4x4.CreateTranslation(1, 1, 1);
             color = new Vector3(.25f, .5f, .5f);
             
             shader = new Shader("Assets/Shaders/lightSource.glsl");
@@ -74,7 +72,7 @@ namespace DumBitEngine.Core.Util
 
             shader.Use();
             shader.SetMatrix4("projection", ref Camera.main.projection);
-            shader.SetMatrix4("transform", ref transform);
+            shader.SetMatrix4("transform", ref parent.transform);
             shader.SetVector3("color", ref color);
         }
         
@@ -84,7 +82,7 @@ namespace DumBitEngine.Core.Util
 
             shader.Use();
             shader.SetMatrix4("view", ref Camera.main.view);
-            shader.SetMatrix4("transform", ref transform);
+            shader.SetMatrix4("transform", ref parent.transform);
             shader.SetMatrix4("projection", ref Camera.main.projection);
             
             
@@ -114,9 +112,9 @@ namespace DumBitEngine.Core.Util
         {
             ImGui.Text(name);
 
-            var position = transform.Translation;
+            var position = parent.transform.Translation;
             ImGui.DragFloat3("Position", ref position);
-            transform.Translation = position;
+            parent.transform.Translation = position;
 
             ImGui.ColorPicker3("Color", ref color);
         }

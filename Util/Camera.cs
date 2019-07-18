@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK.Audio.OpenAL;
 
 namespace DumBitEngine.Core.Util
 {
@@ -58,8 +59,8 @@ namespace DumBitEngine.Core.Util
 
         public void UpdateFOV(float amount)
         {
-            
-            if ( fov - amount >= 45f)
+
+            if (fov - amount >= 45f)
                 fov = 45f;
             else if (fov - amount <= 1f)
                 fov = 1f;
@@ -114,6 +115,8 @@ namespace DumBitEngine.Core.Util
                 UpdateCameraLook();
 
             view = Matrix4.LookAt(cameraPos, cameraFront + cameraPos, cameraUp);
+
+            AL.Listener(ALListenerfv.Orientation, ref cameraPos, ref cameraUp);
         }
 
         public void InputUpdate()

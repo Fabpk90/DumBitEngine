@@ -63,8 +63,6 @@ namespace DumBitEngine.Core.Sound
 
             string s = path.Substring(path.IndexOf('.'));
 
-            Console.WriteLine(s);
-
             switch (s)
             {
                 case ".wav":
@@ -187,18 +185,14 @@ namespace DumBitEngine.Core.Sound
 
         public static void Update()
         {
-            //var rotation = Camera.main.view.ExtractRotation().Xyz;
-
             foreach (Source source in sources)
             {
                 if (source.IsPlaying())
                 {
                     AL.Source(source.sourceID, ALSource3f.Position, ref Camera.main.cameraPos);
-                    //AL.Source(source.sourceID, ALSource3f.Direction, ref rotation);
                 }
             }
             
-           
         }
     }
 }

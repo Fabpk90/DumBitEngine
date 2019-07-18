@@ -24,7 +24,7 @@ namespace DumBitEngine.Core.Shapes
 
         public bool isRotating;
 
-        public Model(string path, string meshName) : base("mesh")
+        public Model(string path, string meshName, GameObject parent = null) : base("mesh", parent)
         {
             var asset = AssetLoader.UseElement(path + meshName);
             
@@ -41,8 +41,6 @@ namespace DumBitEngine.Core.Shapes
 
                     this.meshName = meshName;
                     this.path = path;
-                    
-                    transform = Matrix4x4.Identity;
                 }
             }
             else
@@ -54,14 +52,12 @@ namespace DumBitEngine.Core.Shapes
                 shader = new Shader("Assets/Shaders/mesh.glsl");
                 shader.Use();
 
-                transform = Matrix4x4.Identity;
-
-                shader.SetMatrix4("model", ref transform);
+                shader.SetMatrix4("model", ref parent.transform);
                 shader.SetMatrix4("view", ref Camera.main.view);
                 shader.SetMatrix4("projection", ref Camera.main.projection);
                 
                 shader.SetVector3("lightColor", ref Game.light.color);
-                shader.SetVector3("light.lightPos",  Game.light.transform.Translation);
+                shader.SetVector3("light.lightPos",  Game.light.parent.transform.Translation);
 
                 meshes = new List<Mesh>();
 
@@ -71,9 +67,8 @@ namespace DumBitEngine.Core.Shapes
                 if (scene != null)
                 {
                     ProcessNode(scene.RootNode, scene);
+                    scene.Clear();
                 }
-                
-                scene.Clear();
                 
                 AssetLoader.AddElement(path+meshName, this);
             }           
@@ -197,19 +192,19 @@ namespace DumBitEngine.Core.Shapes
             
             //Console.WriteLine(transform);
             if(isRotating)
-                transform *= parent.transform * Matrix4x4.CreateRotationY(Time.deltaTime);
+                parent.transform *= Matrix4x4.CreateRotationY(Time.deltaTime);
             
-            shader.SetMatrix4("model", ref transform);
+            shader.SetMatrix4("model", ref parent.transform);
             shader.SetMatrix4("view", ref Camera.main.view);
             shader.SetVector3("viewPos", Camera.main.view.ExtractTranslation());
             shader.SetVector3("light.lightColor", ref Game.light.color);
             shader.SetMatrix4("projection", ref Camera.main.projection);
-            shader.SetVector3("light.lightPos",  Game.light.transform.Translation);
+            shader.SetVector3("light.lightPos",  Game.light.parent.transform.Translation);
 
             //Console.WriteLine(Game.light.transform.ExtractTranslation());
             
             shader.SetFloat("material.shininess", 32);
-            
+
             foreach (var mesh in meshes)
             {
                 mesh.Draw(ref shader);
@@ -220,9 +215,9 @@ namespace DumBitEngine.Core.Shapes
         {
             ImGui.Text(name);
 
-            var position = transform.Translation;
+            var position = parent.transform.Translation;
             ImGui.DragFloat3("Position", ref position);
-            transform.Translation = position;
+            parent.transform.Translation = position;
 
             if(ImGui.Button("Load Another Model"))
             {
@@ -237,7 +232,7 @@ namespace DumBitEngine.Core.Shapes
                 newPath = newPath.Remove(newPath.Length - fileDialog.SafeFileName.Length);
                 Console.WriteLine(newPath);
 
-                Model m = new Model(newPath, fileDialog.SafeFileName);
+                Model m = new Model(newPath, fileDialog.SafeFileName, parent);
 
                 AssetLoader.RemoveElement(path + meshName);
 

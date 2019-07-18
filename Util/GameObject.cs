@@ -10,12 +10,14 @@ namespace DumBitEngine.Core.Util
 {
     public class GameObject : Entity
     {
+        public Matrix4x4 transform;
         private List<Entity> attachedComponent;
 
-        public GameObject(string name) : base(name)
+        public GameObject(string name, GameObject parent = null) : base(name, parent)
         {
             attachedComponent = new List<Entity>();
             transform = Matrix4x4.Identity;
+            this.parent = parent;
         }
 
         public override void GetUiToDraw()

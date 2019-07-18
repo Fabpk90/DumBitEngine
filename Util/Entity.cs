@@ -8,16 +8,14 @@ namespace DumBitEngine.Util
     {
         public bool isActive;
         public string name;
-        
-        public Matrix4x4 transform;
+
         public GameObject parent;
 
-        public Entity(string name)
+        public Entity(string name, GameObject parent)
         {
             isActive = true;
             this.name = name;
-
-            transform = Matrix4x4.Identity;
+            this.parent = parent;
         }
 
         public abstract void GetUiToDraw();

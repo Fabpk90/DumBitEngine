@@ -10,9 +10,8 @@ namespace DumBitEngine.Core.Shapes
         
         //TODO: add new things here, like a transform maybe
         //insert a shader in there, with a corresponding dispose
-        public Shape(string name) : base(name)
+        public Shape(string name, GameObject parent = null) : base(name, parent)
         {
-           transform = Matrix4x4.Identity;
         }
     }
 }
