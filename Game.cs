@@ -13,6 +13,7 @@ using BepuPhysics.Collidables;
 using BepuUtilities.Memory;
 using DumBitEngine.Core.Physics;
 using DumBitEngine.Core.Sound;
+using DumBitEngine.Util;
 using ImGuiNET;
 using Vector2 = System.Numerics.Vector2;
 using Vector3 = System.Numerics.Vector3;
@@ -75,14 +76,14 @@ namespace DumBitEngine
             
             GameObject cubeGO = new GameObject("Cube");
             var cube = new Cube("Assets/container.jpg", cubeGO);
-            cube.parent.transform *= Matrix4x4.CreateScale(10, 0.1f, 10);
-            cube.parent.transform *= Matrix4x4.CreateTranslation(0, -1f, 0);
+            cube.Parent.getMatrix4X4() *= Matrix4x4.CreateScale(10, 0.1f, 10);
+            cube.Parent.getMatrix4X4() *= Matrix4x4.CreateTranslation(0, -1f, 0);
             cubeGO.AddComponent(cube);
 
             var modelGO = new GameObject("Model");
             modelGO.AddComponent(new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj", modelGO));
-            modelGO.GetComponent<Model>().parent.transform *= Matrix4x4.CreateTranslation(0, -1.75f, 0);
-            modelGO.GetComponent<Model>().parent.transform *= Matrix4x4.CreateScale(.2f, .2f, .2f);
+            modelGO.GetComponent<Model>().Parent.getMatrix4X4() *= Matrix4x4.CreateTranslation(0, -1.75f, 0);
+            modelGO.GetComponent<Model>().Parent.getMatrix4X4() *= Matrix4x4.CreateScale(.2f, .2f, .2f);
             modelGO.GetComponent<Model>().isRotating = true;
 
             scene.Add(modelGO);
@@ -100,23 +101,24 @@ namespace DumBitEngine
             presentationSource = AudioMaster.LoadSourceAndSound("Assets/Sound/bounce.wav");
             presentationSource.SetPosition(Vector3.Zero);
             
-            //RunSimulation();
+            RunSimulation();
             
             base.OnLoad(e);
         }
 
         private void RunSimulation()
         {
-            SimpleSelfContainedDemo.Init();
+            Physics.Init();
             
             GameObject g = new GameObject("Ya know it");
             dynCube = new Cube("Assets/container.jpg", g);
             
             g.AddComponent(dynCube);
+            g.AddComponent(new RigidBody("RigidBody"));
             
             scene.Add(g);
 
-            var sim = SimpleSelfContainedDemo.sim;
+            var sim = Physics.sim;
             
             for (int i = 0; i < sim.Bodies.Sets.Length; ++i)
             {
@@ -137,14 +139,17 @@ namespace DumBitEngine
                                     {
                                         //the shape data is a raw pointer to the according shape
                                         //useful for radius/length etc...
-                                        SimpleSelfContainedDemo.sim.Shapes[shape.Type]
+                                        Physics.sim.Shapes[shape.Type]
                                             .GetShapeData(shape.Index, out var shapeData, out var size);
                                         
                                         ref var box = ref Unsafe.AsRef<Box>(shapeData);
-                                        Console.WriteLine("Yesxx");
 
-                                        dynCube.parent.transform.Translation = p.Position;
-                                        dynCube.parent.transform *= Matrix4x4.CreateScale(box.Width, box.Height, box.Length);
+                                        dynCube.Parent.getMatrix4X4().Translation = p.Position;
+                                        dynCube.Parent.getMatrix4X4() *= Matrix4x4.CreateScale(box.Width, box.Height, box.Length);
+
+                                        dynCube.Parent.GetComponent<RigidBody>().info = set.Poses;
+                                        dynCube.Parent.GetComponent<RigidBody>().index = bodyIndex;
+                                        
 
                                     }
                                     
@@ -162,7 +167,7 @@ namespace DumBitEngine
             
             scene.Add(go);
 
-            var statics = SimpleSelfContainedDemo.sim.Statics;
+            var statics = Physics.sim.Statics;
             //first draw the statics 
            // for (int i = 0; i < SimpleSelfContainedDemo.sim.Statics.Count; i++)
             //{
@@ -182,13 +187,13 @@ namespace DumBitEngine
 
                         //the shape data is a raw pointer to the according shape
                         //useful for radius/length etc...
-                        SimpleSelfContainedDemo.sim.Shapes[statics.Collidables[i].Shape.Type]
+                        Physics.sim.Shapes[statics.Collidables[i].Shape.Type]
                             .GetShapeData(statics.Collidables[i].Shape.Index, out var shapeData, out var size);
                         var pose = statics.Poses[i];
                         ref var box = ref Unsafe.AsRef<Box>(shapeData);
 
-                        cube.parent.transform.Translation = pose.Position;
-                        cube.parent.transform *= Matrix4x4.CreateScale(box.Width, box.Height, box.Length);
+                        cube.Parent.getMatrix4X4().Translation = pose.Position;
+                        cube.Parent.getMatrix4X4() *= Matrix4x4.CreateScale(box.Width, box.Height, box.Length);
 
 
                         break;
@@ -242,15 +247,10 @@ namespace DumBitEngine
             MasterInput.Update();
             AudioMaster.Update();
 
-            frameCount++;
-            frameCount %= 3;
 
-            if (frameCount == 0)
-            {
-               // SimpleSelfContainedDemo.Update();
-            }
+            Physics.Update();
 
-            
+
 
             HandleInput();
 
@@ -305,7 +305,7 @@ namespace DumBitEngine
                 }
                 else if (MasterInput.IsKeyDown(Key.P))
                 {
-                    SimpleSelfContainedDemo.sim.Timestep(Time.deltaTime);
+                    dynCube.Parent.AddPosition(0, 10, 0);
                 }
             }
 

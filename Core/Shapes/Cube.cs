@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Numerics;
 using DumBitEngine.Core.Sound;
 using DumBitEngine.Core.Util;
+using DumBitEngine.Util;
 using ImGuiNET;
 using OpenTK;
 using OpenTK.Graphics;
@@ -114,14 +115,14 @@ namespace DumBitEngine.Core.Shapes
         {
             if (isRotating)
             {
-                parent.transform *= Matrix4x4.CreateRotationY(Time.deltaTime);
-                parent.transform *= Matrix4x4.CreateRotationX(Time.deltaTime);
+                Parent.getMatrix4X4() *= Matrix4x4.CreateRotationY(Time.deltaTime);
+                Parent.getMatrix4X4() *= Matrix4x4.CreateRotationX(Time.deltaTime);
             }
 
             GL.BindVertexArray(vao);
 
             shaderProgram.Use();
-            shaderProgram.SetMatrix4("transform", ref parent.transform);
+            shaderProgram.SetMatrix4("transform", ref Parent.getMatrix4X4());
             shaderProgram.SetMatrix4("view", ref Camera.main.view);
             shaderProgram.SetMatrix4("projection", ref Camera.main.projection);
             
@@ -136,9 +137,9 @@ namespace DumBitEngine.Core.Shapes
         {
             ImGui.Text(name);
 
-            var position = parent.transform.Translation;
+            var position = Parent.getMatrix4X4().Translation;
             ImGui.DragFloat3("Position", ref position);
-            parent.transform.Translation = position;
+            Parent.getMatrix4X4().Translation = position;
         }
     }
 }

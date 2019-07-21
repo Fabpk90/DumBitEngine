@@ -10,6 +10,7 @@ using Camera = DumBitEngine.Core.Util.Camera;
 using Scene = Assimp.Scene;
 using ImGuiNET;
 using System.Windows.Forms;
+using DumBitEngine.Util;
 
 namespace DumBitEngine.Core.Shapes
 {
@@ -52,12 +53,12 @@ namespace DumBitEngine.Core.Shapes
                 shader = new Shader("Assets/Shaders/mesh.glsl");
                 shader.Use();
 
-                shader.SetMatrix4("model", ref parent.transform);
+                shader.SetMatrix4("model", ref parent.getMatrix4X4());
                 shader.SetMatrix4("view", ref Camera.main.view);
                 shader.SetMatrix4("projection", ref Camera.main.projection);
                 
                 shader.SetVector3("lightColor", ref Game.light.color);
-                shader.SetVector3("light.lightPos",  Game.light.parent.transform.Translation);
+                shader.SetVector3("light.lightPos",  Game.light.Parent.getMatrix4X4().Translation);
 
                 meshes = new List<Mesh>();
 
@@ -192,14 +193,14 @@ namespace DumBitEngine.Core.Shapes
             
             //Console.WriteLine(transform);
             if(isRotating)
-                parent.transform *= Matrix4x4.CreateRotationY(Time.deltaTime);
+                Parent.getMatrix4X4() *= Matrix4x4.CreateRotationY(Time.deltaTime);
             
-            shader.SetMatrix4("model", ref parent.transform);
+            shader.SetMatrix4("model", ref Parent.getMatrix4X4());
             shader.SetMatrix4("view", ref Camera.main.view);
             shader.SetVector3("viewPos", Camera.main.view.ExtractTranslation());
             shader.SetVector3("light.lightColor", ref Game.light.color);
             shader.SetMatrix4("projection", ref Camera.main.projection);
-            shader.SetVector3("light.lightPos",  Game.light.parent.transform.Translation);
+            shader.SetVector3("light.lightPos",  Game.light.Parent.getMatrix4X4().Translation);
 
             //Console.WriteLine(Game.light.transform.ExtractTranslation());
             
@@ -215,9 +216,9 @@ namespace DumBitEngine.Core.Shapes
         {
             ImGui.Text(name);
 
-            var position = parent.transform.Translation;
+            var position = Parent.getMatrix4X4().Translation;
             ImGui.DragFloat3("Position", ref position);
-            parent.transform.Translation = position;
+            Parent.getMatrix4X4().Translation = position;
 
             if(ImGui.Button("Load Another Model"))
             {
@@ -232,7 +233,7 @@ namespace DumBitEngine.Core.Shapes
                 newPath = newPath.Remove(newPath.Length - fileDialog.SafeFileName.Length);
                 Console.WriteLine(newPath);
 
-                Model m = new Model(newPath, fileDialog.SafeFileName, parent);
+                Model m = new Model(newPath, fileDialog.SafeFileName, Parent);
 
                 AssetLoader.RemoveElement(path + meshName);
 

@@ -1,23 +1,41 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using System.Runtime.CompilerServices;
-using DumBitEngine.Util;
 using ImGuiNET;
-using OpenTK;
 
-namespace DumBitEngine.Core.Util
+namespace DumBitEngine.Util
 {
     public class GameObject : Entity
     {
-        public Matrix4x4 transform;
+        private Matrix4x4 transform;
         private List<Entity> attachedComponent;
+
+        public event PositionChanged PositionChanged;
 
         public GameObject(string name, GameObject parent = null) : base(name, parent)
         {
             attachedComponent = new List<Entity>();
             transform = Matrix4x4.Identity;
-            this.parent = parent;
+            this.Parent = parent;
+        }
+
+        public ref Matrix4x4 getMatrix4X4()
+        {
+            return ref transform;
+        }
+
+        public void SetPosition(float x, float y, float z)
+        {
+            transform.Translation = new Vector3(x, y ,z);
+            
+            PositionChanged?.Invoke(this, new PositionChangedArgs(x, y, z));
+        }
+        
+        public void AddPosition(float x, float y, float z)
+        {
+            transform.Translation += new Vector3(x, y ,z);
+            
+            PositionChanged?.Invoke(this, new PositionChangedArgs(x, y, z));
         }
 
         public override void GetUiToDraw()
@@ -53,7 +71,7 @@ namespace DumBitEngine.Core.Util
 
             if (!found)
             {
-                ent.parent = this;
+                ent.Parent = this;
                 attachedComponent.Add(ent);
             }
             else
@@ -117,6 +135,23 @@ namespace DumBitEngine.Core.Util
             {
                 entity.Draw();
             }
+        }
+        
+    }
+
+    public delegate void PositionChanged(object sender, PositionChangedArgs args);
+
+    public struct PositionChangedArgs
+    {
+        public float x;
+        public float y;
+        public float z;
+
+        public PositionChangedArgs(float x, float y, float z)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
         }
     }
 }

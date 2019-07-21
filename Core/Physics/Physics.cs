@@ -6,23 +6,50 @@ using BepuUtilities;
 using BepuUtilities.Memory;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using DumBitEngine.Core.Util;
 
 namespace DumBitEngine.Core.Physics
 {
-    public class Physics
+    public static class Physics
     {
+        public static List<RigidBody> physicsBodies;
+        public static Simulation sim;
+        public static BufferPool pool;
+
+        //copied from bepuphysics demo, we'll see if a thread is needed
+        private static SimpleThreadDispatcher thread;
+
+        public static void Init()
+        {
+            //The buffer pool is a source of raw memory blobs for the engine to use.
+            pool = new BufferPool();
+            //Note that you can also control the order of internal stage execution using a different ITimestepper implementation.
+            //For the purposes of this demo, we just use the default by passing in nothing (which happens to be PositionFirstTimestepper at the time of writing).
+            sim = Simulation.Create(pool, new NarrowPhaseCallbacks(), new PoseIntegratorCallbacks(new Vector3(0, -10, 0)));
+            
+            physicsBodies = new List<RigidBody>();
+            
+            thread = new SimpleThreadDispatcher(Environment.ProcessorCount);
+            
+            //Drop a ball on a big static box.
+            var sphere = new Box(10, 1, 10);
+            sphere.ComputeInertia(1, out var sphereInertia);
+            sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia,
+                new CollidableDescription(sim.Shapes.Add(sphere), 0.1f), new BodyActivityDescription(0.01f)));
+
+            sim.Statics.Add(new StaticDescription(new Vector3(0, -1, 0), new CollidableDescription(sim.Shapes.Add(new Box(500, 1, 500)), 0.1f)));
+        }
+
+        public static void AddBody(RigidBody body)
+        {
+            physicsBodies.Add(body);
+        }
         
-    }
-    
-    /// <summary>
-    /// Shows a completely isolated usage of the engine without using any of the other demo types.
-    /// </summary>
-    public static class SimpleSelfContainedDemo
-    {
         //The simulation has a variety of extension points that must be defined. 
         //The demos tend to reuse a few types like the DemoNarrowPhaseCallbacks, but this demo will provide its own (super simple) versions.
         //If you're wondering why the callbacks are interface implementing structs rather than classes or events, it's because 
@@ -189,26 +216,6 @@ namespace DumBitEngine.Core.Physics
 
         }
 
-        public static Simulation sim;
-        public static BufferPool pool;
-
-        public static void Init()
-        {
-            //The buffer pool is a source of raw memory blobs for the engine to use.
-            pool = new BufferPool();
-            //Note that you can also control the order of internal stage execution using a different ITimestepper implementation.
-            //For the purposes of this demo, we just use the default by passing in nothing (which happens to be PositionFirstTimestepper at the time of writing).
-            sim = Simulation.Create(pool, new NarrowPhaseCallbacks(), new PoseIntegratorCallbacks(new Vector3(0, -10, 0)));
-
-            //Drop a ball on a big static box.
-            var sphere = new Box(10, 1, 10);
-            sphere.ComputeInertia(1, out var sphereInertia);
-            sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia,
-                new CollidableDescription(sim.Shapes.Add(sphere), 0.1f), new BodyActivityDescription(0.01f)));
-
-            sim.Statics.Add(new StaticDescription(new Vector3(0, -1, 0), new CollidableDescription(sim.Shapes.Add(new Box(500, 1, 500)), 0.1f)));
-        }
-
         public static void Run()
         {
              // var threadDispatcher = new SimpleThreadDispatcher(Environment.ProcessorCount);
@@ -229,10 +236,121 @@ namespace DumBitEngine.Core.Physics
            // threadDispatcher.Dispose();
            pool.Clear();
         }
+        
+       public class SimpleThreadDispatcher : IThreadDispatcher, IDisposable
+    {
+        int threadCount;
+        public int ThreadCount => threadCount;
+        struct Worker
+        {
+            public Thread Thread;
+            public AutoResetEvent Signal;
+        }
+
+        Worker[] workers;
+        AutoResetEvent finished;
+
+        BufferPool[] bufferPools;
+
+        public SimpleThreadDispatcher(int threadCount)
+        {
+            this.threadCount = threadCount;
+            workers = new Worker[threadCount - 1];
+            for (int i = 0; i < workers.Length; ++i)
+            {
+                workers[i] = new Worker { Thread = new Thread(WorkerLoop), Signal = new AutoResetEvent(false) };
+                workers[i].Thread.IsBackground = true;
+                workers[i].Thread.Start(workers[i].Signal);
+            }
+            finished = new AutoResetEvent(false);
+            bufferPools = new BufferPool[threadCount];
+            for (int i = 0; i < bufferPools.Length; ++i)
+            {
+                bufferPools[i] = new BufferPool();
+            }
+        }
+
+        void DispatchThread(int workerIndex)
+        {
+            Debug.Assert(workerBody != null);
+            workerBody(workerIndex);
+
+            if (Interlocked.Increment(ref completedWorkerCounter) == threadCount)
+            {
+                finished.Set();
+            }
+        }
+
+        volatile Action<int> workerBody;
+        int workerIndex;
+        int completedWorkerCounter;
+
+        void WorkerLoop(object untypedSignal)
+        {
+            var signal = (AutoResetEvent)untypedSignal;
+            while (true)
+            {
+                signal.WaitOne();
+                if (disposed)
+                    return;
+                DispatchThread(Interlocked.Increment(ref workerIndex) - 1);
+            }
+        }
+
+        void SignalThreads()
+        {
+            for (int i = 0; i < workers.Length; ++i)
+            {
+                workers[i].Signal.Set();
+            }
+        }
+
+        public void DispatchWorkers(Action<int> workerBody)
+        {
+            Debug.Assert(this.workerBody == null);
+            workerIndex = 1; //Just make the inline thread worker 0. While the other threads might start executing first, the user should never rely on the dispatch order.
+            completedWorkerCounter = 0;
+            this.workerBody = workerBody;
+            SignalThreads();
+            //Calling thread does work. No reason to spin up another worker and block this one!
+            DispatchThread(0);
+            finished.WaitOne();
+            this.workerBody = null;
+        }
+
+        volatile bool disposed;
+        public void Dispose()
+        {
+            if (!disposed)
+            {
+                disposed = true;
+                SignalThreads();
+                for (int i = 0; i < bufferPools.Length; ++i)
+                {
+                    bufferPools[i].Clear();
+                }
+                foreach (var worker in workers)
+                {
+                    worker.Thread.Join();
+                    worker.Signal.Dispose();
+                }
+            }
+        }
+
+        public BufferPool GetThreadMemoryPool(int workerIndex)
+        {
+            return bufferPools[workerIndex];
+        }
+    }
 
         public static void Update()
         {
             sim.Timestep(Time.deltaTime);
+
+            for (int i = 0; i < physicsBodies.Count; i++)
+            {
+                physicsBodies[i].Draw();
+            }
         }
     }
 }

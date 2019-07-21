@@ -72,7 +72,7 @@ namespace DumBitEngine.Core.Util
 
             shader.Use();
             shader.SetMatrix4("projection", ref Camera.main.projection);
-            shader.SetMatrix4("transform", ref parent.transform);
+            shader.SetMatrix4("transform", ref parent.getMatrix4X4());
             shader.SetVector3("color", ref color);
         }
         
@@ -82,7 +82,7 @@ namespace DumBitEngine.Core.Util
 
             shader.Use();
             shader.SetMatrix4("view", ref Camera.main.view);
-            shader.SetMatrix4("transform", ref parent.transform);
+            shader.SetMatrix4("transform", ref Parent.getMatrix4X4());
             shader.SetMatrix4("projection", ref Camera.main.projection);
             
             
@@ -112,9 +112,9 @@ namespace DumBitEngine.Core.Util
         {
             ImGui.Text(name);
 
-            var position = parent.transform.Translation;
+            var position = Parent.getMatrix4X4().Translation;
             ImGui.DragFloat3("Position", ref position);
-            parent.transform.Translation = position;
+            Parent.getMatrix4X4().Translation = position;
 
             ImGui.ColorPicker3("Color", ref color);
         }
