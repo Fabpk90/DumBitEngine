@@ -22,7 +22,8 @@ namespace DumBitEngine.Core.Util
             {
                 io.MousePos = MasterInput.MousePosition;
                 io.MouseDown[0] = MasterInput.IsLeftMouseButtonDown;
-
+                io.MouseWheel = MasterInput.MouseScroll;
+                
                 if (MasterInput.GetKeyPressed(out Key keyPressed))
                 {
                     if (keyPressed == Key.BackSpace)

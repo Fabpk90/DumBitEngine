@@ -14,7 +14,7 @@ using DumBitEngine.Util;
 
 namespace DumBitEngine.Core.Shapes
 {
-    public class Model : Shape
+    public class Model : Entity
     {
         private Shader shader;
 
@@ -53,15 +53,16 @@ namespace DumBitEngine.Core.Shapes
                 shader = new Shader("Assets/Shaders/mesh.glsl");
                 shader.Use();
 
-                shader.SetMatrix4("model", ref parent.getMatrix4X4());
+                
+                shader.SetMatrix4("model", Matrix4.Identity);
                 shader.SetMatrix4("view", ref Camera.main.view);
                 shader.SetMatrix4("projection", ref Camera.main.projection);
                 
-                shader.SetVector3("lightColor", ref Game.light.color);
-                shader.SetVector3("light.lightPos",  Game.light.Parent.getMatrix4X4().Translation);
+                shader.SetVector3("lightColor",  LevelManager.activeScene.GetSceneColor());
+                shader.SetVector3("light.lightPos",  LevelManager.activeScene.lightSources[0].Parent.getMatrix4X4().Translation);
 
                 meshes = new List<Mesh>();
-
+                
                 var scene = context.ImportFile(path + meshName,
                     PostProcessSteps.Triangulate | PostProcessSteps.FlipUVs | PostProcessSteps.GenerateNormals);
 
@@ -72,7 +73,9 @@ namespace DumBitEngine.Core.Shapes
                 }
                 
                 AssetLoader.AddElement(path+meshName, this);
-            }           
+
+                Console.WriteLine(meshName +" has " +meshes.Count);
+            }
         }
 
         private void ProcessNode(Node node, Scene scene)
@@ -98,7 +101,7 @@ namespace DumBitEngine.Core.Shapes
             for (int i = 0; i < mesh.VertexCount; i++)
             {
                 Vertex v;
-                
+
                 v.position.X = mesh.Vertices[i].X;
                 v.position.Y = mesh.Vertices[i].Y;
                 v.position.Z = mesh.Vertices[i].Z;
@@ -132,6 +135,12 @@ namespace DumBitEngine.Core.Shapes
                 textures.AddRange(texDiffuse);
 
                 List<Texture> texSpecular = LoadMaterialTextures(mat, TextureType.Specular, "texture_specular");
+
+                if (texSpecular.Count == 0)
+                {
+                    texSpecular = LoadMaterialTextures(mat, TextureType.Height, "texture_specular");
+                }
+                
                 textures.AddRange(texSpecular);
             }
             
@@ -141,8 +150,6 @@ namespace DumBitEngine.Core.Shapes
         private List<Texture> LoadMaterialTextures(Material material, TextureType type, string typeName)
         {
             List<Texture> tex = new List<Texture>();
-
-            var time = System.DateTime.Now;
 
             for (int i = 0; i < material.GetMaterialTextureCount(type); i++)
             {
@@ -157,10 +164,6 @@ namespace DumBitEngine.Core.Shapes
                 }
                 
             }
-            
-           // var diff = DateTime.Now - time;
-           // Console.WriteLine("Loading "+material.Name+" took : "+diff.Milliseconds);
-
             return tex;
         }
 
@@ -198,13 +201,13 @@ namespace DumBitEngine.Core.Shapes
             shader.SetMatrix4("model", ref Parent.getMatrix4X4());
             shader.SetMatrix4("view", ref Camera.main.view);
             shader.SetVector3("viewPos", Camera.main.view.ExtractTranslation());
-            shader.SetVector3("light.lightColor", ref Game.light.color);
+            shader.SetVector3("light.lightColor", ref LevelManager.activeScene.lightSources[0].color);
             shader.SetMatrix4("projection", ref Camera.main.projection);
-            shader.SetVector3("light.lightPos",  Game.light.Parent.getMatrix4X4().Translation);
+            shader.SetVector3("light.lightPos",  LevelManager.activeScene.lightSources[0].Parent.getMatrix4X4().Translation);
 
             //Console.WriteLine(Game.light.transform.ExtractTranslation());
             
-            shader.SetFloat("material.shininess", 32);
+            shader.SetFloat("material.shininess", 2);
 
             foreach (var mesh in meshes)
             {
@@ -220,9 +223,11 @@ namespace DumBitEngine.Core.Shapes
             ImGui.DragFloat3("Position", ref position);
             Parent.getMatrix4X4().Translation = position;
 
+            ImGui.Checkbox("Rotate ?", ref isRotating);
+
             if(ImGui.Button("Load Another Model"))
             {
-                //TODO: make this crossplatform
+                //TODO: make this cross-platform
                 OpenFileDialog fileDialog = new OpenFileDialog();
                 fileDialog.ShowDialog();
 

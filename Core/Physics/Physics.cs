@@ -42,7 +42,7 @@ namespace DumBitEngine.Core.Physics
             sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia,
                 new CollidableDescription(sim.Shapes.Add(sphere), 0.1f), new BodyActivityDescription(0.01f)));
 
-            sim.Statics.Add(new StaticDescription(new Vector3(0, -1, 0), new CollidableDescription(sim.Shapes.Add(new Box(500, 1, 500)), 0.1f)));
+            sim.Statics.Add(new StaticDescription(new Vector3(0, -1, 0), new CollidableDescription(sim.Shapes.Add(new Box(50, 1, 50)), 0.1f)));
         }
 
         public static void AddBody(RigidBody body)

@@ -21,6 +21,9 @@ namespace DumBitEngine.Core.Util
 
         public LightSource(string name, GameObject parent) : base(name, parent)
         {
+            
+            LevelManager.activeScene.lightSources.Add(this);
+            
             index = new uint[]
             {
                 // note that we start from 0!
@@ -51,7 +54,7 @@ namespace DumBitEngine.Core.Util
                 -0.5f, 0.5f, -0.5f,   
             };
             
-            color = new Vector3(.25f, .5f, .5f);
+            color = new Vector3(.5f, .5f, .5f);
             
             shader = new Shader("Assets/Shaders/lightSource.glsl");
 
@@ -106,6 +109,8 @@ namespace DumBitEngine.Core.Util
             GL.DeleteBuffer(vao);
             GL.DeleteBuffer(vbo);
             GL.DeleteBuffer(ebo);
+
+            LevelManager.activeScene.lightSources.Remove(this);
         }
 
         public override void GetUiToDraw()

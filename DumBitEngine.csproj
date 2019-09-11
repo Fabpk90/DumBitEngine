@@ -31,7 +31,7 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -39,6 +39,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32bit>false</Prefer32bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -62,26 +63,26 @@
       <HintPath>packages\BepuUtilities.2.0.0\lib\netstandard2.0\BepuUtilities.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="BulletSharp, Version=0.11.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\BulletSharp.0.11.1\lib\net40-client\BulletSharp.dll</HintPath>
+    <Reference Include="ImGui.NET, Version=1.71.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>packages\ImGui.NET.1.71.0\lib\netstandard2.0\ImGui.NET.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ImGui.NET, Version=1.70.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\ImGui.NET.1.70.0\lib\netstandard2.0\ImGui.NET.dll</HintPath>
+    <Reference Include="JsonSubTypes, Version=1.6.0.0, Culture=neutral, PublicKeyToken=ee75fc290dbc1176">
+      <HintPath>packages\JsonSubTypes.1.6.0\lib\net46\JsonSubTypes.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="mscorlib" />
-    <Reference Include="OpenTK, Version=3.0.1.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
-      <HintPath>packages\OpenTK.3.0.1\lib\net20\OpenTK.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
+      <HintPath>packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SixLabors.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SixLabors.Core.1.0.0-beta0007\lib\netstandard2.0\SixLabors.Core.dll</HintPath>
+    <Reference Include="OpenTK, Version=3.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
+      <HintPath>packages\OpenTK.3.1.0\lib\net20\OpenTK.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SixLabors.ImageSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\SixLabors.ImageSharp.1.0.0-beta0006\lib\netstandard2.0\SixLabors.ImageSharp.dll</HintPath>
+    <Reference Include="StbImageSharp, Version=2.22.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>packages\StbImageSharp.2.22.2\lib\net45\StbImageSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -116,10 +117,9 @@
     <Compile Include="Core\Shapes\Cube.cs" />
     <Compile Include="Core\Shapes\Mesh.cs" />
     <Compile Include="Core\Shapes\Model.cs" />
-    <Compile Include="Core\Shapes\Shape.cs" />
-    <Compile Include="Core\Sound\AudioMaster.cs" />
-    <Compile Include="Core\Sound\SoundClip.cs" />
-    <Compile Include="Core\Sound\Source.cs" />
+    <Compile Include="Core\Audio\AudioMaster.cs" />
+    <Compile Include="Core\Audio\SoundClip.cs" />
+    <Compile Include="Core\Audio\Source.cs" />
     <Compile Include="Core\UI\ImGuiInput.cs" />
     <Compile Include="Core\UI\ImGuiRenderer.cs" />
     <Compile Include="Editor\Editor.cs" />
@@ -132,6 +132,7 @@
     <Compile Include="Util\Entity.cs" />
     <Compile Include="Util\GameObject.cs" />
     <Compile Include="Util\IRenderable.cs" />
+    <Compile Include="Util\LevelManager.cs" />
     <Compile Include="Util\LightSource.cs" />
     <Compile Include="Util\Scene.cs" />
     <Compile Include="Util\Shader.cs" />
@@ -141,16 +142,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
+    <Content Include="Assets\container.jpg" />
     <Content Include="Assets\Shaders\imgui.glsl" />
     <Content Include="Assets\Shaders\lightSource.glsl" />
     <Content Include="Assets\Sound\bounce.wav" />
-    <Content Include="OpenTK.dll.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\container.jpg" />
     <Content Include="Assets\Shaders\basic.glsl" />
     <Content Include="Assets\Shaders\cube.glsl" />
     <Content Include="Assets\Shaders\mesh.glsl" />
@@ -174,11 +173,9 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('packages\AssimpNet.4.1.0\build\AssimpNet.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\AssimpNet.4.1.0\build\AssimpNet.targets'))" />
-    <Error Condition="!Exists('packages\ImGui.NET.1.70.0\build\net40\ImGui.NET.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\ImGui.NET.1.70.0\build\net40\ImGui.NET.targets'))" />
-    <Error Condition="!Exists('packages\BulletSharp.0.11.1\build\net40-client\BulletSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\BulletSharp.0.11.1\build\net40-client\BulletSharp.targets'))" />
+    <Error Condition="!Exists('packages\ImGui.NET.1.71.0\build\net40\ImGui.NET.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\ImGui.NET.1.71.0\build\net40\ImGui.NET.targets'))" />
   </Target>
-  <Import Project="packages\ImGui.NET.1.70.0\build\net40\ImGui.NET.targets" Condition="Exists('packages\ImGui.NET.1.70.0\build\net40\ImGui.NET.targets')" />
-  <Import Project="packages\BulletSharp.0.11.1\build\net40-client\BulletSharp.targets" Condition="Exists('packages\BulletSharp.0.11.1\build\net40-client\BulletSharp.targets')" />
+  <Import Project="packages\ImGui.NET.1.71.0\build\net40\ImGui.NET.targets" Condition="Exists('packages\ImGui.NET.1.71.0\build\net40\ImGui.NET.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.
     <Target Name="BeforeBuild">

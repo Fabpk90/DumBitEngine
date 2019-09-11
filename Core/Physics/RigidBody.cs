@@ -39,7 +39,10 @@ namespace DumBitEngine.Core.Physics
         public override void GetUiToDraw()
         {
             ImGui.Text(name);
-            ImGui.Checkbox("Active ?", ref isActive);
+            if (!ImGui.Checkbox("Active ?", ref isActive))
+            {
+                
+            }
         }
 
         public override void Awake()

@@ -43,7 +43,7 @@ namespace DumBitEngine.Core.Sound
             
             sources = new List<Source>();
 
-            AL.Listener(ALListener3f.Position, Camera.main.cameraPos.X, Camera.main.cameraPos.Y, Camera.main.cameraPos.Z);
+            AL.Listener(ALListener3f.Position, 0, 0, 0);
             AL.Listener(ALListener3f.Velocity, 0, 0, 0);
         }
 

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Text;
+using System.Xml.Serialization;
 using ImGuiNET;
 
 namespace DumBitEngine.Util
@@ -81,7 +83,7 @@ namespace DumBitEngine.Util
             
         }
 
-        public T GetComponent<T>() where T : class
+        public new T GetComponent<T>() where T : class
         {
             foreach (Entity entity in attachedComponent)
             {
@@ -135,6 +137,18 @@ namespace DumBitEngine.Util
             {
                 entity.Draw();
             }
+        }
+
+        public string Serialize()
+        {
+            StringBuilder str = new StringBuilder();
+
+            foreach (var entity in attachedComponent)
+            {
+                Console.WriteLine(entity.GetType());
+            }
+
+            return str.ToString();
         }
         
     }

@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 
-namespace DumBitEngine.Core.Util
+namespace DumBitEngine.Util
 {
     public static class AssetLoader
     {

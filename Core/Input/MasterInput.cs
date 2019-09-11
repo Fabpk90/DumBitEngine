@@ -21,8 +21,12 @@ namespace DumBitEngine.Core.Util
         private static KeyboardState keyboardStateLastFrame;
 
         private static MouseState mouseState;
+
+        private static float lastMouseWheelPosition;
+        private static float mouseWheelDelta;
         
         public static Vector2 MousePosition => new Vector2(mouseState.X, mouseState.Y);
+        public static float MouseScroll => mouseWheelDelta;
         public static bool IsLeftMouseButtonDown => mouseState[0];
 
         public static void Init()
@@ -39,6 +43,8 @@ namespace DumBitEngine.Core.Util
             }
 
             keyboardStateLastFrame = Keyboard.GetState();
+            
+            lastMouseWheelPosition = 0.0f;
         }
 
         /// <summary>
@@ -47,6 +53,9 @@ namespace DumBitEngine.Core.Util
         public static void Update()
         {
             keyboardState = Keyboard.GetState();
+
+            mouseWheelDelta = lastMouseWheelPosition - mouseState.WheelPrecise;
+            lastMouseWheelPosition = mouseState.WheelPrecise;
 
             for (int i = 0; i < MAX_KEY_SIZE; i++)
             {

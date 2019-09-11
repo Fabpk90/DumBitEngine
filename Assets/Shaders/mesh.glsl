@@ -19,7 +19,7 @@ void main()
     TexCoords = aTexCoords;    
     gl_Position = projection * view * model * vec4(aPos, 1.0f);
     
-    Normal = aNormal * mat3(transpose((model)));
+    Normal = aNormal ; //mat3(transpose((model)));
     FragPos = vec3(model * vec4(aPos, 1.0f));
 }
 
@@ -38,7 +38,6 @@ struct Light
 {
     vec3 lightColor; //The color of the light.
     vec3 lightPos; //The position of the light.
-    
 };
 
 out vec4 FragColor;
@@ -60,13 +59,19 @@ void main()
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(light.lightPos - FragPos);  
     float diff = max(dot(norm, lightDir), 0.0f);
-    vec3 diffuse = diff * light.lightColor;
+    vec3 diffuse = diff * light.lightColor * texture(material.texture_diffuse1, TexCoords).rgb;
     
     float specularStrength = 0.5f;
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 reflectDir = reflect(lightDir, norm); 
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
-    vec3 specular = specularStrength * spec * light.lightColor;
+    //float spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);*/
+    
+    /*Using a fast alternative to the phong model by Christophe Schlick (Graphics Gems 4)*/
+    
+    float dotDir = dot(viewDir, reflectDir);
+    float spec = dotDir / (material.shininess - (material.shininess * dotDir) + dotDir);
+    
+    vec3 specular = specularStrength * spec * vec3(texture(material.texture_specular1, TexCoords));
 
-    FragColor = vec4(diffuse + specular + ambient, 1.0f) * texture(material.texture_diffuse1, TexCoords);
+    FragColor = vec4(diffuse + specular + ambient, 1.0f);// * texture(material.texture_diffuse1, TexCoords);
 }

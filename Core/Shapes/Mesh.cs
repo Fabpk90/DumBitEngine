@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using Assimp;
 using Assimp.Unmanaged;
 using DumBitEngine.Core.Util;
+using DumBitEngine.Util;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using PrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType;
@@ -83,9 +84,9 @@ namespace DumBitEngine.Core.Shapes
                     number = ""+normalNr++; // transfer unsigned int to stream
                 else if(name == "texture_height")
                     number = ""+heightNr++; // transfer unsigned int to stream
-                
+
                 shader.SetInt("material."+name+number, i);
-                
+
                 //finally bind the texture
                 GL.BindTexture(TextureTarget.Texture2D, textures[i].id);
             }

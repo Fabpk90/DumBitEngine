@@ -1,13 +1,22 @@
 using System;
+using System.IO;
 using System.Numerics;
+using System.Runtime.Serialization;
+using System.Text;
+using System.Xml.Serialization;
 using DumBitEngine.Core.Util;
+using JsonSubTypes;
+using Newtonsoft.Json;
 
 namespace DumBitEngine.Util
 {
+    [JsonConverter(typeof(JsonSubtypes), "EntityType")]
     public abstract class Entity : IRenderable, IDisposable
     {
         public bool isActive;
         public string name;
+
+        protected string EntityType = "Test";
 
         protected GameObject parent;
         public GameObject Parent
@@ -50,5 +59,10 @@ namespace DumBitEngine.Util
 
         public abstract void Dispose();
         public abstract void Draw();
+        public virtual void Serialize(StreamWriter sw, JsonSerializer serializer)
+        {
+            serializer.Serialize(sw, isActive);
+            serializer.Serialize(sw, name);
+        }
     }
 }

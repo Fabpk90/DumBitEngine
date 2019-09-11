@@ -1,22 +1,35 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DumBitEngine.Core.Shapes;
-using DumBitEngine.Util;
+using System.IO;
+using System.Numerics;
+using DumBitEngine.Core.Util;
 using ImGuiNET;
+using Newtonsoft.Json;
 
-namespace DumBitEngine.Core.Util
+namespace DumBitEngine.Util
 {
     public class Scene : Entity
     {
         private List<GameObject> sceneGraph;
         private GameObject selectedObject;
 
+        public List<LightSource> lightSources;
+
+        private string sceneName;
+
         public Scene(string name) : base(name, null)
         {
             sceneGraph = new List<GameObject>();
+            sceneName = name;
+            lightSources = new List<LightSource>();
+        }
+
+        public Vector3 GetSceneColor()
+        {
+            if(lightSources.Count == 0)
+                return Vector3.Zero;;
+
+            //TODO: compute for each light maybe ?
+            return lightSources[0].color;
         }
 
         public void Add(GameObject entity)
@@ -24,8 +37,13 @@ namespace DumBitEngine.Core.Util
             sceneGraph.Add(entity);
         }
 
-        public override void Awake()
+        public GameObject Get(int index)
         {
+            return sceneGraph[index];
+        }
+
+        public override void Awake()
+        {   
             foreach (GameObject gameObject in sceneGraph)
             {
                 gameObject.Awake();
@@ -67,7 +85,7 @@ namespace DumBitEngine.Core.Util
 
             if (ImGui.Button("Add GO"))
             {
-                GameObject go = new GameObject("GameObject", null);
+                GameObject go = new GameObject("GameObject");
                 sceneGraph.Add(go);
             }
 
@@ -81,6 +99,21 @@ namespace DumBitEngine.Core.Util
                 }
             }
 
+           
+            ImGui.InputText("Scene name: ", ref sceneName, 250);
+            if (ImGui.Button("Save Scene"))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.NullValueHandling = NullValueHandling.Include;
+                serializer.Formatting = Formatting.Indented;
+                
+                using (StreamWriter sw = new StreamWriter(sceneName + ".level"))
+                using (JsonWriter writer = new JsonTextWriter(sw))
+                {
+                    serializer.Serialize(writer, sceneGraph);
+                    // {"ExpiryDate":new Date(1230375600000),"Price":0}
+                }
+            }
             
         }
 

@@ -1,4 +1,4 @@
-namespace DumBitEngine.Core.Util
+namespace DumBitEngine.Util
 {
     public interface IRenderable
     {

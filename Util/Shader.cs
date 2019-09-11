@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Numerics;
+using DumBitEngine.Util;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using Vector3 = OpenTK.Vector3;
@@ -114,6 +115,11 @@ namespace DumBitEngine.Core.Util
         }
 
         public void SetMatrix4(string name, ref Matrix4 matrix)
+        {
+            GL.UniformMatrix4(GL.GetUniformLocation(ProgramId, name),false, ref matrix);
+        }
+        
+        public void SetMatrix4(string name, Matrix4 matrix)
         {
             GL.UniformMatrix4(GL.GetUniformLocation(ProgramId, name),false, ref matrix);
         }

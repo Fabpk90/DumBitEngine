@@ -22,22 +22,17 @@ namespace DumBitEngine
 {
     public class Game : GameWindow
     {
-
-        public static Scene scene;
-        public static LightSource light;
+        public Scene scene;
 
         private ImGuiRenderer imguiRenderer;
         private ImGuiInput imguiInput;
 
         public static bool isCursorVisible;
 
-        private int testingInt = 0;
-
         private Cube cube;
 
         private Source presentationSource;
         private Cube dynCube;
-        private uint frameCount;
 
         /* TODO add a menu of some sort
             optimize the handling of vertices (store only the vertices and different transform for each)
@@ -56,6 +51,9 @@ namespace DumBitEngine
 
         protected override void OnLoad(EventArgs e)
         {
+            scene = new Scene("Scene");
+            LevelManager.activeScene = scene;
+            
             GL.Enable(EnableCap.DepthTest);
 
             isCursorVisible = CursorVisible = false;
@@ -63,17 +61,12 @@ namespace DumBitEngine
 
             Camera.main = new Camera(Width / Height);
 
-            AudioMaster.Init();
-
             imguiRenderer = new ImGuiRenderer("Assets/Shaders/imgui.glsl", Width, Height);
             
             GameObject lightGO = new GameObject("Light Source");
-            light = new LightSource("Light", lightGO); // TODO: remove this(static) and find a solution for shader using it
+            var light = new LightSource("Light", lightGO);
             lightGO.AddComponent(light);
-            
-            
-            scene = new Scene("Scene");
-            
+
             GameObject cubeGO = new GameObject("Cube");
             var cube = new Cube("Assets/container.jpg", cubeGO);
             cube.Parent.getMatrix4X4() *= Matrix4x4.CreateScale(10, 0.1f, 10);
@@ -81,35 +74,35 @@ namespace DumBitEngine
             cubeGO.AddComponent(cube);
 
             var modelGO = new GameObject("Model");
-            modelGO.AddComponent(new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj", modelGO));
+           /* modelGO.AddComponent(new Model("Assets/Mesh/Nanosuit/", "nanosuit.obj", modelGO));
             modelGO.GetComponent<Model>().Parent.getMatrix4X4() *= Matrix4x4.CreateTranslation(0, -1.75f, 0);
             modelGO.GetComponent<Model>().Parent.getMatrix4X4() *= Matrix4x4.CreateScale(.2f, .2f, .2f);
-            modelGO.GetComponent<Model>().isRotating = true;
+            modelGO.GetComponent<Model>().isRotating = true;*/
+            
+            modelGO.AddComponent(new Model("Assets/Mesh/Sponza/", "sponza.obj", modelGO));
 
             scene.Add(modelGO);
             scene.Add(cubeGO);
             
             scene.Add(lightGO);
-            
+
             imguiInput = new ImGuiInput();
             
-            MasterInput.Init();
             MouseDown += (sender, args) => MasterInput.MouseEvent(args);
             MouseUp += (sender, args) => MasterInput.MouseEvent(args);
             MouseMove += (sender, args) => MasterInput.MouseEvent(args);
+            MouseWheel += (sender, args) => MasterInput.MouseEvent(args);
 
             presentationSource = AudioMaster.LoadSourceAndSound("Assets/Sound/bounce.wav");
             presentationSource.SetPosition(Vector3.Zero);
             
-            RunSimulation();
+            //RunSimulation();
             
             base.OnLoad(e);
         }
 
         private void RunSimulation()
         {
-            Physics.Init();
-            
             GameObject g = new GameObject("Ya know it");
             dynCube = new Cube("Assets/container.jpg", g);
             
@@ -133,8 +126,6 @@ namespace DumBitEngine
                             switch (shape.Type)
                             {
                                 case Box.Id:
-                                    Console.WriteLine("Boxxxxxxx");
-
                                     unsafe
                                     {
                                         //the shape data is a raw pointer to the according shape
@@ -230,6 +221,8 @@ namespace DumBitEngine
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)
         {
+            
+            
             Camera.main.UpdateFOV(e.DeltaPrecise);
             
             base.OnMouseWheel(e);
@@ -243,12 +236,10 @@ namespace DumBitEngine
             }
             
             Time.deltaTime = (float) e.Time;
-            //inputState.Update(Keyboard.GetState());
+            
             MasterInput.Update();
             AudioMaster.Update();
-
-
-            Physics.Update();
+            //Physics.Update();
 
 
 
@@ -260,31 +251,14 @@ namespace DumBitEngine
             GL.ClearColor(Color.Black);
 
             ImGui.NewFrame();
-            scene.Draw();
-
-            
             imguiInput.UpdateUI();
-
-            ImGui.Text("sa");
-            ImGui.Begin("Yes it is");
-            ImGui.Text("Testing");
-
-            if (ImGui.Button("yess"))
-            {
-                Console.WriteLine("YEESS");
-            }
-
-
-            //ImGui.DragInt4()
             
-            ImGui.End();
+            scene.Draw();
 
             ImGui.EndFrame();
             ImGui.Render();
             imguiRenderer.DrawData();
-            
-            
-            
+
             SwapBuffers();
             
             base.OnUpdateFrame(e);

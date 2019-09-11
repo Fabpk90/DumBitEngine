@@ -1,6 +1,8 @@
 using System;
 using System.Drawing;
 using System.Numerics;
+using System.Runtime.Serialization;
+using System.Text;
 using DumBitEngine.Core.Sound;
 using DumBitEngine.Core.Util;
 using DumBitEngine.Util;
@@ -11,7 +13,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace DumBitEngine.Core.Shapes
 {
-    public class Cube : Shape
+    public class Cube : Entity
     {
         private int vao;
         private int vbo;
@@ -21,28 +23,26 @@ namespace DumBitEngine.Core.Shapes
 
         private Texture texture0;
         
-        private readonly uint[] index;
+        private readonly uint[] index =
+        {
+            // note that we start from 0!
+            0, 1, 2,
+            2, 3, 0,
+            4, 5, 6,
+            6, 7, 4,
+            0, 4, 1,
+            1, 5, 4,
+            2, 6, 3,
+            3, 7, 6,
+            0, 4, 3,
+            3, 7, 4,
+            2, 6, 5,
+            2, 1, 5
+        };
         public bool isRotating;
 
         public Cube(string texturePath, GameObject parent = null) : base("Cube", parent)
         {
-            index = new uint[]
-            {
-                // note that we start from 0!
-                0, 1, 2,
-                2, 3, 0,
-                4, 5, 6,
-                6, 7, 4,
-                0, 4, 1,
-                1, 5, 4,
-                2, 6, 3,
-                3, 7, 6,
-                0, 4, 3,
-                3, 7, 4,
-                2, 6, 5,
-                2, 1, 5
-            };
-
             var vertex = new float[]
             {
                 //pos                   //color        //texcoord
@@ -85,7 +85,6 @@ namespace DumBitEngine.Core.Shapes
             shaderProgram.SetMatrix4("projection", ref Camera.main.projection);
             
            texture0 = new Texture(texturePath, "");
-
            shaderProgram.SetInt("tex0", 0);
         }
 
@@ -125,12 +124,13 @@ namespace DumBitEngine.Core.Shapes
             shaderProgram.SetMatrix4("transform", ref Parent.getMatrix4X4());
             shaderProgram.SetMatrix4("view", ref Camera.main.view);
             shaderProgram.SetMatrix4("projection", ref Camera.main.projection);
-            
-            shaderProgram.SetVector3("lightColor", ref Game.light.color);
-            
+        
+            shaderProgram.SetVector3("lightColor", LevelManager.activeScene.GetSceneColor());
+        
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D ,texture0.id);
             GL.DrawElements(PrimitiveType.Triangles, index.Length, DrawElementsType.UnsignedInt, 0);
+            
         }
 
         public override void GetUiToDraw()

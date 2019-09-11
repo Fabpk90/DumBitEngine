@@ -1,15 +1,10 @@
 using System;
-using System.Collections;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using OpenTK.Graphics.OpenGL;
-using SixLabors.ImageSharp.Advanced;
-using SixLabors.ImageSharp.Formats;
-using Image = SixLabors.ImageSharp.Image;
+using StbImageSharp;
 using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 
-namespace DumBitEngine.Core.Util
+namespace DumBitEngine.Util
 {
     public class Texture : IDisposable
     {
@@ -39,14 +34,19 @@ namespace DumBitEngine.Core.Util
                 GL.ActiveTexture(TextureUnit.Texture0);
                 GL.GenTextures(1, out id);
                 GL.BindTexture(TextureTarget.Texture2D, id);
-
-                var stream = File.OpenRead(path);
-
-                IImageFormat config;
-                var img = Image.Load(stream, out config);
                 
+
+                ImageStreamLoader loader = new ImageStreamLoader();
+                using (Stream stream = File.Open(path, FileMode.Open)) 
+                {
+                    var image = loader.Load(stream, ColorComponents.RedGreenBlueAlpha);
+                    
+                    GL.TexImage2D(TextureTarget.Texture2D, 0,
+                        PixelInternalFormat.Rgba
+                        , image.Width, image.Height, 0,
+                        PixelFormat.Rgba, PixelType.UnsignedByte, image.Data);
+                }
                 
-                stream.Close();
 
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int) TextureWrapMode.Repeat);
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int) TextureWrapMode.Repeat);
@@ -55,10 +55,7 @@ namespace DumBitEngine.Core.Util
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
                     (int) TextureMinFilter.Linear);
 
-                GL.TexImage2D(TextureTarget.Texture2D, 0,
-                     PixelInternalFormat.Rgba
-                    , img.Width, img.Height, 0,
-                    PixelFormat.Rgba, PixelType.UnsignedByte, img.GetPixelSpan().ToArray());
+                
 
                 GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 

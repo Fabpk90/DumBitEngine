@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DumBitEngine.Util;
 using OpenTK.Audio.OpenAL;
 
 namespace DumBitEngine.Core.Util
@@ -55,10 +56,17 @@ namespace DumBitEngine.Core.Util
             yaw = pitch = 0.0f;
             mouseSensitivity = .25f;
             fov = 45f;
+
+            if (Camera.main == null)
+            {
+                Camera.main = this;
+            }
         }
 
         public void UpdateFOV(float amount)
         {
+            if(Game.isCursorVisible)
+                return;
 
             if (fov - amount >= 45f)
                 fov = 45f;
